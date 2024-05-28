@@ -8,7 +8,7 @@ export default function ProductsPage() {
   return (
     <>
       <Helmet>
-        <title> Продукты </title>
+        <title> Продукты | Shecker Partners </title>
       </Helmet>
 
       <ProductsView /> 

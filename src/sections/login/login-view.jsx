@@ -1,6 +1,6 @@
+// src/sections/LoginView.jsx
 import { useState } from 'react';
 import axios from 'axios';
-
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import Card from '@mui/material/Card';
@@ -13,19 +13,14 @@ import IconButton from '@mui/material/IconButton';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { alpha, useTheme } from '@mui/material/styles';
 import InputAdornment from '@mui/material/InputAdornment';
-
-import { useRouter } from 'src/routes/hooks';
-
+import { useNavigate } from 'react-router-dom';
 import { bgGradient } from 'src/theme/css';
-
 import Logo from 'src/components/logo';
 import Iconify from 'src/components/iconify';
 
-// ----------------------------------------------------------------------
-
 export default function LoginView() {
   const theme = useTheme();
-  const router = useRouter();
+  const navigate = useNavigate();
 
   const [showPassword, setShowPassword] = useState(false);
   const [username, setUsername] = useState('');
@@ -47,11 +42,12 @@ export default function LoginView() {
         token: access,
       });
 
-      // Store tokens (you may want to use a more secure storage method)
+      // Store tokens and username (you may want to use a more secure storage method)
       localStorage.setItem('accessToken', access);
       localStorage.setItem('refreshToken', refresh);
+      localStorage.setItem('username', username);
 
-      router.push('/');
+      navigate('/');
     } catch (error) {
       console.error('Login failed:', error);
     } finally {
@@ -60,7 +56,7 @@ export default function LoginView() {
   };
 
   const handleGetStarted = () => {
-    router.push('/register');
+    navigate('/register');
   };
 
   const renderForm = (

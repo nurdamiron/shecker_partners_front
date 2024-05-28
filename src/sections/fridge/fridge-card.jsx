@@ -7,7 +7,7 @@ import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import { useState, useEffect } from 'react';
-import { ref, onValue, set } from 'firebase/database';
+import { ref, onValue, off, set } from 'firebase/database';
 import { database } from 'src/firebase_config'; // Adjust the import path according to your file structure
 
 export default function FridgeCard({ fridge, index }) {
@@ -22,17 +22,25 @@ export default function FridgeCard({ fridge, index }) {
   useEffect(() => {
     const fridgeRef = ref(database, `${id}/timer/timer`);
     const doorRef = ref(database, `${id}/door/doorOpen`);
-    
-    onValue(fridgeRef, (snapshot) => {
+
+    const timerListener = (snapshot) => {
       const timerValue = snapshot.val();
       setTimer(timerValue);
       setIsAvailable(Date.now() - timerValue < 20000);
-    });
+    };
 
-    onValue(doorRef, (snapshot) => {
+    const doorListener = (snapshot) => {
       const doorValue = snapshot.val();
       setDoorStatus(doorValue);
-    });
+    };
+
+    onValue(fridgeRef, timerListener);
+    onValue(doorRef, doorListener);
+
+    return () => {
+      off(fridgeRef, 'value', timerListener);
+      off(doorRef, 'value', doorListener);
+    };
   }, [id]);
 
   const handleOpenDoor = () => {
@@ -78,6 +86,7 @@ export default function FridgeCard({ fridge, index }) {
       <Typography variant="caption">Address: {address}</Typography>
       <Typography variant="caption">Owner: {owner}</Typography>
       <Typography variant="caption">Status: {isAvailable ? 'Available' : 'Not Available'}</Typography>
+      <Typography variant="caption">Door: {doorStatus ? 'Open' : 'Closed'}</Typography>
     </Stack>
   );
 
@@ -98,10 +107,10 @@ export default function FridgeCard({ fridge, index }) {
           {renderInfo}
           <Stack direction="row" spacing={2} sx={{ mt: 3 }}>
             <Button variant="contained" color="primary" onClick={handleOpenDoor}>
-              Open Door
+              Открыть дверь
             </Button>
             <Button variant="contained" color="secondary" onClick={handleCloseDoor}>
-              Close Door
+              Закрыть дверь
             </Button>
           </Stack>
         </Box>

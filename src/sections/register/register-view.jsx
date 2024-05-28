@@ -1,5 +1,5 @@
+// src/sections/RegisterView.jsx
 import { useState } from 'react';
-
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import Card from '@mui/material/Card';
@@ -12,25 +12,19 @@ import IconButton from '@mui/material/IconButton';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { alpha, useTheme } from '@mui/material/styles';
 import InputAdornment from '@mui/material/InputAdornment';
-
-import { useRouter } from 'src/routes/hooks';
-
+import { useNavigate } from 'react-router-dom';
 import { bgGradient } from 'src/theme/css';
-
 import Logo from 'src/components/logo';
 import Iconify from 'src/components/iconify';
 
-// ----------------------------------------------------------------------
-
 export default function RegisterView() {
   const theme = useTheme();
-
-  const router = useRouter();
+  const navigate = useNavigate();
 
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
-    company: '',
+    username: '',
     password: '',
     password2: ''
   });
@@ -48,7 +42,11 @@ export default function RegisterView() {
       body: JSON.stringify(formData)
     });
     if (response.ok) {
-      router.push('/login');
+      const data = await response.json();
+      // Store the email and username in localStorage
+      localStorage.setItem('email', data.email);
+      localStorage.setItem('username', data.username);
+      navigate('/login');
     } else {
       console.error('Registration failed');
     }
@@ -58,7 +56,7 @@ export default function RegisterView() {
     <>
       <Stack spacing={3}>
         <TextField name="email" label="Email address" value={formData.email} onChange={handleChange} />
-        <TextField name="company" label="Company" value={formData.company} onChange={handleChange} />
+        <TextField name="username" label="Username" value={formData.username} onChange={handleChange} />
         <TextField
           name="password"
           label="Password"
@@ -142,7 +140,7 @@ export default function RegisterView() {
 
           <Typography variant="body2" sx={{ mt: 2, mb: 5 }}>
             Already have an account?
-            <Link variant="subtitle2" sx={{ ml: 0.5 }}>
+            <Link variant="subtitle2" sx={{ ml: 0.5 }} onClick={() => navigate('/login')}>
               Login
             </Link>
           </Typography>
