@@ -7,41 +7,55 @@ import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import { useState, useEffect } from 'react';
-import { ref, onValue, off, set } from 'firebase/database';
+import { ref, onValue, get, set } from 'firebase/database';
 import { database } from 'src/firebase_config'; // Adjust the import path according to your file structure
+import LocationOnIcon from '@mui/icons-material/LocationOn'; // Import location icon
 
 export default function FridgeCard({ fridge, index }) {
   const { account, address, owner, id } = fridge;
-  const latestFridgeLarge = index === 0;
-  const latestFridge = index === 1 || index === 2;
 
   const [doorStatus, setDoorStatus] = useState(0);
-  const [timer, setTimer] = useState(0);
   const [isAvailable, setIsAvailable] = useState(false);
+  const [lastTimer, setLastTimer] = useState(0);
 
   useEffect(() => {
     const fridgeRef = ref(database, `${id}/timer/timer`);
     const doorRef = ref(database, `${id}/door/doorOpen`);
 
-    const timerListener = (snapshot) => {
-      const timerValue = snapshot.val();
-      setTimer(timerValue);
-      setIsAvailable(Date.now() - timerValue < 20000);
+    // Function to handle timer updates
+    const handleTimerUpdate = (snapshot) => {
+      const currentTimer = snapshot.val();
+      setLastTimer(currentTimer);
+      setIsAvailable(true);
     };
 
-    const doorListener = (snapshot) => {
+    // Listen to timer changes
+    const timerListener = onValue(fridgeRef, handleTimerUpdate);
+
+    // Listen to door status changes
+    const doorListener = onValue(doorRef, (snapshot) => {
       const doorValue = snapshot.val();
       setDoorStatus(doorValue);
-    };
+    });
 
-    onValue(fridgeRef, timerListener);
-    onValue(doorRef, doorListener);
+    // Set interval to check the timer every 15 seconds
+    const intervalId = setInterval(() => {
+      get(fridgeRef).then((snapshot) => {
+        const currentTimer = snapshot.val();
+        if (currentTimer === lastTimer) {
+          setIsAvailable(false);
+        }
+      }).catch((error) => {
+        console.error('Error fetching timer:', error);
+      });
+    }, 15000);
 
     return () => {
-      off(fridgeRef, 'value', timerListener);
-      off(doorRef, 'value', doorListener);
+      clearInterval(intervalId);
+      timerListener();
+      doorListener();
     };
-  }, [id]);
+  }, [id, lastTimer]);
 
   const handleOpenDoor = () => {
     set(ref(database, `${id}/door/doorOpen`), 1);
@@ -52,67 +66,88 @@ export default function FridgeCard({ fridge, index }) {
   };
 
   const renderAccount = (
-    <Link
-      color="inherit"
-      variant="subtitle2"
-      underline="hover"
+    <Typography
+      variant="h4"
       sx={{
-        height: 44,
-        overflow: 'hidden',
-        WebkitLineClamp: 2,
-        display: '-webkit-box',
-        WebkitBoxOrient: 'vertical',
-        ...(latestFridgeLarge && { typography: 'h5', height: 60 }),
-        ...((latestFridgeLarge || latestFridge) && {
-          color: 'common.white',
-        }),
+        color: 'black',
       }}
     >
       {account}
-    </Link>
+    </Typography>
   );
 
   const renderInfo = (
     <Stack
       direction="row"
-      flexWrap="wrap"
-      spacing={1.5}
-      justifyContent="space-between"
-      sx={{
-        mt: 3,
-        color: 'text.disabled',
-      }}
+      alignItems="center"
+      spacing={1}
+      justifyContent="flex-start"
+      sx={{ mt: 1 }}
     >
-      <Typography variant="caption">Address: {address}</Typography>
-      <Typography variant="caption">Owner: {owner}</Typography>
-      <Typography variant="caption">Status: {isAvailable ? 'Available' : 'Not Available'}</Typography>
-      <Typography variant="caption">Door: {doorStatus ? 'Open' : 'Closed'}</Typography>
+      <LocationOnIcon />
+      <Typography 
+        variant="h6"
+        sx={{
+          color: '#F873FB',
+        }}
+      
+      >{address}</Typography>
     </Stack>
   );
 
+  const renderStatus = (
+    <Typography variant="caption">{doorStatus ? 'Открыт' : 'Закрыт'}</Typography>
+  );
+
   return (
-    <Grid xs={12} sm={latestFridgeLarge ? 12 : 6} md={latestFridgeLarge ? 6 : 3}>
-      <Card>
+    <Grid xs={12} sm={6} md={3}>
+      <Card
+        sx={{
+          backgroundColor: isAvailable ? 'white' : 'grey.300',
+          backgroundImage: isAvailable
+            ? 'url(/assets/background/fridge_background.png)'
+            : 'url(/assets/background/fridge_gray.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          height: 200,
+          textAlign: 'center',
+          color: isAvailable ? 'black' : 'white', // Adjust text color based on background
+        }}
+      >
         <Box
           sx={{
-            p: (theme) => theme.spacing(4, 3, 3, 3),
-            ...((latestFridgeLarge || latestFridge) && {
-              width: 1,
-              bottom: 0,
-              position: 'absolute',
-            }),
+            p: 4,
+            width: 1,
+            bottom: 0,
+            position: 'relative',
           }}
         >
-          {renderAccount}
-          {renderInfo}
-          <Stack direction="row" spacing={2} sx={{ mt: 3 }}>
-            <Button variant="contained" color="primary" onClick={handleOpenDoor}>
-              Открыть дверь
-            </Button>
-            <Button variant="contained" color="secondary" onClick={handleCloseDoor}>
-              Закрыть дверь
-            </Button>
-          </Stack>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexDirection: 'column',
+            }}
+          >
+            {renderAccount}
+            {renderInfo}
+          </Box>
+          {renderStatus}
+          {isAvailable ? (
+            <Stack direction="row" alignItems="center" spacing={1} sx={{ mt: 3 }}>
+              <Button variant="contained" color="primary" onClick={handleOpenDoor}>
+                Открыть
+              </Button>
+              <Button variant="contained" color="secondary" onClick={handleCloseDoor}>
+                Закрыть
+              </Button>
+            </Stack>
+          ) : (
+            <Typography variant="h6" color="error">
+              Недоступен
+            </Typography>
+          )}
         </Box>
       </Card>
     </Grid>

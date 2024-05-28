@@ -76,7 +76,8 @@ const fetchFridges = async (setFridges) => {
 export default function FridgeView() {
   const [fridges, setFridges] = useState([]);
   const [sortedFridges, setSortedFridges] = useState([]);
-  
+  const [sortType, setSortType] = useState('number'); // Set default sort type
+
   useEffect(() => {
     fetchFridges(setFridges);
   }, []);
@@ -86,25 +87,23 @@ export default function FridgeView() {
   }, [fridges]);
 
   const handleSort = (event) => {
-    const sortType = event.target.value;
+    const newSortType = event.target.value;
+    setSortType(newSortType);
 
     const sorted = [...fridges].sort((a, b) => {
-      if (sortType === 'number') {
-        return a.account.localeCompare(b.account);
-      }
-      if (sortType === 'availability') {
-        if (a.isAvailable === b.isAvailable) {
+      switch (newSortType) {
+        case 'number':
+          return a.account.localeCompare(b.account);
+        case 'availability':
+          if (a.isAvailable === b.isAvailable) return 0;
+          return a.isAvailable ? -1 : 1;
+        case 'address':
+          return a.address.localeCompare(b.address);
+        case 'owner':
+          return a.owner?.localeCompare(b.owner) || 0;
+        default:
           return 0;
-        }
-        return a.isAvailable ? -1 : 1;
       }
-      if (sortType === 'address') {
-        return a.address.localeCompare(b.address);
-      }
-      if (sortType === 'owner') {
-        return a.owner?.localeCompare(b.owner) || 0;
-      }
-      return 0;
     });
 
     setSortedFridges(sorted);
@@ -115,7 +114,7 @@ export default function FridgeView() {
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
         <Typography variant="h4">Холодильники</Typography>
         <Button variant="contained" color="inherit" startIcon={<Iconify icon="eva:plus-fill" />}>
-          Добавить холодильник
+          Добавить
         </Button>
       </Stack>
 
@@ -128,6 +127,7 @@ export default function FridgeView() {
             { value: 'address', label: 'By Address' },
             { value: 'owner', label: 'By Owner' },
           ]}
+          value={sortType}
           onSort={handleSort}
         />
       </Stack>
