@@ -159,9 +159,9 @@ export default function UserPage() {
   return (
     <Container>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">Refrigerators</Typography>
+        <Typography variant="h4">Пользователи</Typography>
         <Button variant="contained" color="inherit" startIcon={<Iconify icon="eva:plus-fill" />}>
-          Add Refrigerator
+          Добавить
         </Button>
       </Stack>
 

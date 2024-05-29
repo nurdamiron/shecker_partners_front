@@ -13,8 +13,6 @@ import TextField from '@mui/material/TextField';
 import Iconify from 'src/components/iconify';
 
 import ProductCard from '../product-card';
-// import ProductSort from '../product-sort';
-// import ProductFilters from '../product-filters';
 
 // Function to refresh access token
 const refreshAccessToken = async () => {
@@ -112,7 +110,6 @@ const fetchProducts = async (setProducts) => {
 // ----------------------------------------------------------------------
 
 export default function ProductsView() {
-  // const [openFilter, setOpenFilter] = useState(false);
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [openModal, setOpenModal] = useState(false);
@@ -127,14 +124,6 @@ export default function ProductsView() {
   useEffect(() => {
     fetchProducts(setProducts);
   }, []);
-
-  // const handleOpenFilter = () => {
-  //   setOpenFilter(true);
-  // };
-
-  // const handleCloseFilter = () => {
-  //   setOpenFilter(false);
-  // };
 
   const handleDeleteProduct = (id) => {
     setProducts(products.filter(product => product.id !== id));
@@ -175,7 +164,7 @@ export default function ProductsView() {
     let imageUrl = formData.image;
 
     if (imageFile) {
-      const storageRef = ref(storage, `${imageFile.name}`);
+      const storageRef = ref(storage, `products/${imageFile.name}`);
       const uploadTask = uploadBytesResumable(storageRef, imageFile);
 
       uploadTask.on(
@@ -188,6 +177,7 @@ export default function ProductsView() {
         },
         async () => {
           imageUrl = await getDownloadURL(uploadTask.snapshot.ref);
+          console.log('Image URL:', imageUrl); // Log the image URL for debugging
           await updateProduct(imageUrl);
         }
       );
@@ -208,7 +198,7 @@ export default function ProductsView() {
         }
       }
 
-      await axios.put(`https://shecker-admin.com/api/product/admin/${selectedProduct.id}`, {
+      await axios.patch(`https://shecker-admin.com/api/product/admin/${selectedProduct.id}`, {
         ...formData,
         image: imageUrl,
       }, {
@@ -221,34 +211,21 @@ export default function ProductsView() {
       handleCloseModal();
     } catch (error) {
       console.error('Error updating product:', error);
+      if (error.response && error.response.data.detail) {
+        console.error('Server response:', error.response.data.detail);
+      }
     }
   };
 
   return (
     <Container>
-      <Typography variant="h4" sx={{ mb: 5 }}>
-        Продукты
-      </Typography>
-        
-
-      <Stack
-        direction="row"
-        alignItems="center"
-        flexWrap="wrap-reverse"
-        justifyContent="flex-end"
-        sx={{ mb: 5 }}
-      >
-        <Stack direction="row" spacing={1} flexShrink={0} sx={{ my: 1 }}>    
-          {/* <ProductFilters
-            openFilter={openFilter}
-            onOpenFilter={handleOpenFilter}
-            onCloseFilter={handleCloseFilter}
-          />
-          <ProductSort /> */}
-          <Button variant="contained" color="inherit" startIcon={<Iconify icon="eva:plus-fill" />}>
+      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 5 }}>
+        <Typography variant="h4">
+          Продукты
+        </Typography>
+        <Button variant="contained" color="inherit" startIcon={<Iconify icon="eva:plus-fill" />}>
           Добавить продукт
         </Button>
-        </Stack>
       </Stack>
 
       <Grid container spacing={3}>
@@ -258,7 +235,6 @@ export default function ProductsView() {
           </Grid>
         ))}
       </Grid>
-
 
       <Modal open={openModal} onClose={handleCloseModal}>
         <div style={{ padding: 20, backgroundColor: 'white', borderRadius: 8, width: '400px' }}>

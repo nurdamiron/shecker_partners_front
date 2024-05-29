@@ -60,7 +60,7 @@ export default function LoginView() {
   };
 
   const renderForm = (
-    <>
+    <Box>
       <Stack spacing={3}>
         <TextField
           name="email"
@@ -89,7 +89,7 @@ export default function LoginView() {
 
       <Stack direction="row" alignItems="center" justifyContent="flex-end" sx={{ my: 3 }}>
         <Link variant="subtitle2" underline="hover">
-          Forgot password?
+          Забыли пароль?
         </Link>
       </Stack>
 
@@ -102,9 +102,9 @@ export default function LoginView() {
         loading={loading}
         onClick={handleLogin}
       >
-        Login
+        Войти
       </LoadingButton>
-    </>
+    </Box>
   );
 
   return (
@@ -117,15 +117,13 @@ export default function LoginView() {
         height: 1,
       }}
     >
-      <Logo
-        sx={{
-          position: 'fixed',
-          top: { xs: 16, md: 24 },
-          left: { xs: 16, md: 24 },
-        }}
-      />
+      <Stack alignItems="center" justifyContent="center" sx={{ mx: 3, height: 1 }}>
+        <Logo
+          sx={{
+            mb: 5,
+          }}
+        />
 
-      <Stack alignItems="center" justifyContent="center" sx={{ height: 1 }}>
         <Card
           sx={{
             p: 5,
@@ -133,12 +131,12 @@ export default function LoginView() {
             maxWidth: 420,
           }}
         >
-          <Typography variant="h4">Sign in to Minimal</Typography>
+          <Typography variant="h4">Войти</Typography>
 
           <Typography variant="body2" sx={{ mt: 2, mb: 5 }}>
-            Don’t have an account?
+            Нету аккаунта?
             <Link variant="subtitle2" sx={{ ml: 0.5 }} onClick={handleGetStarted}>
-              Get started
+              Зарегистрироваться
             </Link>
           </Typography>
 
@@ -176,7 +174,7 @@ export default function LoginView() {
 
           <Divider sx={{ my: 3 }}>
             <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-              OR
+              или 
             </Typography>
           </Divider>
 
