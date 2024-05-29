@@ -8,20 +8,21 @@ import IconButton from '@mui/material/IconButton';
 // ----------------------------------------------------------------------
 
 const LANGS = [
+  
+  {
+    value: 'ru',
+    label: 'Русский',
+    icon: '/assets/icons/ic_flag_ru.svg',
+  },
+  {
+    value: 'kz',
+    label: 'Қазақша',
+    icon: '/assets/icons/ic_flag_kz.svg',
+  },
   {
     value: 'en',
     label: 'English',
     icon: '/assets/icons/ic_flag_en.svg',
-  },
-  {
-    value: 'de',
-    label: 'German',
-    icon: '/assets/icons/ic_flag_de.svg',
-  },
-  {
-    value: 'fr',
-    label: 'French',
-    icon: '/assets/icons/ic_flag_fr.svg',
   },
 ];
 

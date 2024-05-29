@@ -238,14 +238,12 @@ export default function ProductsView() {
         justifyContent="flex-end"
         sx={{ mb: 5 }}
       >
-        <Stack direction="row" spacing={1} flexShrink={0} sx={{ my: 1 }}>
-          
+        <Stack direction="row" spacing={1} flexShrink={0} sx={{ my: 1 }}>    
           {/* <ProductFilters
             openFilter={openFilter}
             onOpenFilter={handleOpenFilter}
             onCloseFilter={handleCloseFilter}
           />
-
           <ProductSort /> */}
           <Button variant="contained" color="inherit" startIcon={<Iconify icon="eva:plus-fill" />}>
           Добавить продукт

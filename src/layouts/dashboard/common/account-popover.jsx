@@ -1,6 +1,6 @@
-// src/components/AccountPopover.jsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import Box from '@mui/material/Box';
 import Avatar from '@mui/material/Avatar';
 import Divider from '@mui/material/Divider';
@@ -12,21 +12,18 @@ import IconButton from '@mui/material/IconButton';
 
 const MENU_OPTIONS = [
   {
-    label: 'Home',
-    icon: 'eva:home-fill',
-  },
-  {
-    label: 'Profile',
+    label: 'Профиль',
     icon: 'eva:person-fill',
   },
   {
-    label: 'Settings',
+    label: 'Настройки',
     icon: 'eva:settings-2-fill',
   },
 ];
 
 export default function AccountPopover() {
   const [open, setOpen] = useState(null);
+  const [companyName, setCompanyName] = useState('');
   const navigate = useNavigate();
 
   const handleOpen = (event) => {
@@ -48,7 +45,27 @@ export default function AccountPopover() {
     navigate('/login');
   };
 
-  const username = localStorage.getItem('username');
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const accessToken = localStorage.getItem('accessToken');
+        const response = await axios.get('https://www.shecker-admin.com/api/staff/', {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`
+          }
+        });
+        if (response.data && response.data.length > 0) {
+          setCompanyName(response.data[0].company);
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  // const username = localStorage.getItem('username');
   const email = localStorage.getItem('email');
 
   return (
@@ -72,7 +89,7 @@ export default function AccountPopover() {
             border: (theme) => `solid 2px ${theme.palette.background.default}`,
           }}
         >
-          {username?.charAt(0).toUpperCase()}
+          {companyName?.charAt(0).toUpperCase()}
         </Avatar>
       </IconButton>
 
@@ -93,7 +110,7 @@ export default function AccountPopover() {
       >
         <Box sx={{ my: 1.5, px: 2 }}>
           <Typography variant="subtitle2" noWrap>
-            {username}
+            {companyName}
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
             {email}
@@ -116,7 +133,7 @@ export default function AccountPopover() {
           onClick={handleLogout}
           sx={{ typography: 'body2', color: 'error.main', py: 1.5 }}
         >
-          Logout
+          Выйти
         </MenuItem>
       </Popover>
     </>
