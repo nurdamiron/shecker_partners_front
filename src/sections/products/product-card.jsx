@@ -5,7 +5,6 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from 'src/firebase_config'; // Импорт без расширения
 
 import Box from '@mui/material/Box';
-import Link from '@mui/material/Link';
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
@@ -18,7 +17,6 @@ import DialogTitle from '@mui/material/DialogTitle';
 import TextField from '@mui/material/TextField';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { fCurrency } from 'src/utils/format-number';
 
 // ----------------------------------------------------------------------
 
@@ -112,8 +110,8 @@ export default function ShopProductCard({ product, onDelete }) {
   );
 
   const renderPrice = (
-    <Typography variant="subtitle1">
-      {fCurrency(product.price)}
+    <Typography variant="subtitle1" style={{fontSize: '20px'}}>
+      {(product.price)} KZT
     </Typography>
   );
 
@@ -123,9 +121,9 @@ export default function ShopProductCard({ product, onDelete }) {
         {renderImg}
       </Box>
       <Stack spacing={2} sx={{ p: 2 }}>
-        <Link color="inherit" underline="hover" variant="subtitle2" noWrap>
+      <Typography variant="body2" noWrap>
           {product.name}
-        </Link>
+        </Typography>
         <Typography variant="body2" noWrap>
           {product.description}
         </Typography>

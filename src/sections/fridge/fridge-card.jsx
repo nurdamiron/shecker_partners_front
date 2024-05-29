@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
-import Link from '@mui/material/Link';
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
 import Grid from '@mui/material/Unstable_Grid2';
@@ -12,7 +11,7 @@ import { database } from 'src/firebase_config'; // Adjust the import path accord
 import LocationOnIcon from '@mui/icons-material/LocationOn'; // Import location icon
 
 export default function FridgeCard({ fridge, index }) {
-  const { account, address, owner, id } = fridge;
+  const { account, address, id } = fridge;
 
   const [doorStatus, setDoorStatus] = useState(0);
   const [isAvailable, setIsAvailable] = useState(false);
@@ -67,9 +66,14 @@ export default function FridgeCard({ fridge, index }) {
 
   const renderAccount = (
     <Typography
-      variant="h4"
+      variant="h3"
       sx={{
-        color: 'black',
+        height: 44,
+        overflow: 'hidden',
+        WebkitLineClamp: 2,
+        display: '-webkit-box',
+        WebkitBoxOrient: 'vertical',
+        color: 'common.black',
       }}
     >
       {account}
@@ -77,26 +81,17 @@ export default function FridgeCard({ fridge, index }) {
   );
 
   const renderInfo = (
-    <Stack
-      direction="row"
-      alignItems="center"
-      spacing={1}
-      justifyContent="flex-start"
-      sx={{ mt: 1 }}
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'left',
+        justifyContent: 'left',
+        mt: 2,
+      }}
     >
-      <LocationOnIcon />
-      <Typography 
-        variant="h6"
-        sx={{
-          color: '#F873FB',
-        }}
-      
-      >{address}</Typography>
-    </Stack>
-  );
-
-  const renderStatus = (
-    <Typography variant="caption">{doorStatus ? 'Открыт' : 'Закрыт'}</Typography>
+      <LocationOnIcon style={{fontSize: "18px"}} />
+      <Typography variant="caption">{address}</Typography>
+    </Box>
   );
 
   return (
@@ -108,9 +103,9 @@ export default function FridgeCard({ fridge, index }) {
             ? 'url(/assets/background/fridge_background.png)'
             : 'url(/assets/background/fridge_gray.png)',
           backgroundSize: 'cover',
-          backgroundPosition: 'center',
+          backgroundPosition: 'left',
           height: 200,
-          textAlign: 'center',
+          textAlign: 'left',
           color: isAvailable ? 'black' : 'white', // Adjust text color based on background
         }}
       >
@@ -122,25 +117,16 @@ export default function FridgeCard({ fridge, index }) {
             position: 'relative',
           }}
         >
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexDirection: 'column',
-            }}
-          >
-            {renderAccount}
-            {renderInfo}
-          </Box>
-          {renderStatus}
+          {renderAccount}
+          {renderInfo}
+          <Typography variant="caption"> {doorStatus ? 'Открыт' : 'Закрыт'}</Typography>
           {isAvailable ? (
-            <Stack direction="row" alignItems="center" spacing={1} sx={{ mt: 3 }}>
+            <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
               <Button variant="contained" color="primary" onClick={handleOpenDoor}>
-                Открыть
+                Открыть дверь
               </Button>
               <Button variant="contained" color="secondary" onClick={handleCloseDoor}>
-                Закрыть
+                Закрыть дверь
               </Button>
             </Stack>
           ) : (

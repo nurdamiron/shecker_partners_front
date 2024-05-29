@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
@@ -76,38 +76,41 @@ const fetchFridges = async (setFridges) => {
 export default function FridgeView() {
   const [fridges, setFridges] = useState([]);
   const [sortedFridges, setSortedFridges] = useState([]);
-  const [sortType, setSortType] = useState('number'); // Set default sort type
+  const [sortType, setSortType] = useState('availability');
 
   useEffect(() => {
     fetchFridges(setFridges);
   }, []);
 
-  useEffect(() => {
-    setSortedFridges(fridges);
-  }, [fridges]);
-
-  const handleSort = (event) => {
-    const newSortType = event.target.value;
-    setSortType(newSortType);
+  const handleSort = useCallback((event) => {
+    const selectedSortType = event.target.value;
+    setSortType(selectedSortType);
 
     const sorted = [...fridges].sort((a, b) => {
-      switch (newSortType) {
-        case 'number':
-          return a.account.localeCompare(b.account);
-        case 'availability':
-          if (a.isAvailable === b.isAvailable) return 0;
-          return a.isAvailable ? -1 : 1;
-        case 'address':
-          return a.address.localeCompare(b.address);
-        case 'owner':
-          return a.owner?.localeCompare(b.owner) || 0;
-        default:
-          return 0;
+      if (selectedSortType === 'number') {
+        return a.account.localeCompare(b.account);
       }
+      if (selectedSortType === 'availability') {
+        if (a.isAvailable === b.isAvailable) {
+          return a.account.localeCompare(b.account);
+        }
+        return a.isAvailable ? -1 : 1;
+      }
+      if (selectedSortType === 'address') {
+        return a.address.localeCompare(b.address);
+      }
+      if (selectedSortType === 'owner') {
+        return a.owner?.localeCompare(b.owner) || 0;
+      }
+      return 0;
     });
 
     setSortedFridges(sorted);
-  };
+  }, [fridges]);
+
+  useEffect(() => {
+    handleSort({ target: { value: 'availability' } });
+  }, [fridges, handleSort]);
 
   return (
     <Container>
@@ -118,17 +121,17 @@ export default function FridgeView() {
         </Button>
       </Stack>
 
-      <Stack mb={5} direction="row" alignItems="center" justifyContent="space-between">
+      <Stack mb={5} direction="row" alignItems="center" justifyContent="space-between" spacing={2}>
         <FridgeSearch fridge={fridges} />
         <FridgeSort 
           options={[
-            { value: 'number', label: 'By Number' },
-            { value: 'availability', label: 'By Availability' },
-            { value: 'address', label: 'By Address' },
-            { value: 'owner', label: 'By Owner' },
+            { value: 'number', label: 'По номеру' },
+            { value: 'availability', label: 'По доступности' },
+            { value: 'address', label: 'По адресу' },
+            { value: 'owner', label: 'По владельцу' },
           ]}
-          value={sortType}
           onSort={handleSort}
+          value={sortType} // Set the default selected value
         />
       </Stack>
 

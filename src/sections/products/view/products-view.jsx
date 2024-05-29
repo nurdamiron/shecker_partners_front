@@ -15,7 +15,6 @@ import Iconify from 'src/components/iconify';
 import ProductCard from '../product-card';
 // import ProductSort from '../product-sort';
 // import ProductFilters from '../product-filters';
-import ProductCartWidget from '../product-cart-widget';
 
 // Function to refresh access token
 const refreshAccessToken = async () => {
@@ -262,7 +261,6 @@ export default function ProductsView() {
         ))}
       </Grid>
 
-      <ProductCartWidget />
 
       <Modal open={openModal} onClose={handleCloseModal}>
         <div style={{ padding: 20, backgroundColor: 'white', borderRadius: 8, width: '400px' }}>

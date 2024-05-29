@@ -15,7 +15,7 @@ FridgeSearch.propTypes = {
 export default function FridgeSearch({ fridges }) {
   return (
     <Autocomplete
-      sx={{ width: 280 }}
+      sx={{ width: 280, height: 40}}
       autoHighlight
       popupIcon={null}
       slotProps={{
