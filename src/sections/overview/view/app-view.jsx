@@ -129,19 +129,19 @@ export default function AppView() {
           />
         </Grid>
 
-        <Grid xs={12} sm={6} md={3}>
+        {/* <Grid xs={12} sm={6} md={3}>
           <AppWidgetSummary
             title="Подключенные партнеры"
             total={1}
             color="info"
             icon={<img alt="icon" src="/assets/icons/user.svg" />}
           />
-        </Grid>
+        </Grid> */}
 
         <Grid xs={12} sm={6} md={3}>
           <AppWidgetSummary
             title="Количество заказов"
-            total={1}
+            total={234}
             color="warning"
             icon={<img alt="icon" src="/assets/icons/sales.svg" />}
           />
@@ -150,7 +150,7 @@ export default function AppView() {
         <Grid xs={12} sm={6} md={3}>
           <AppWidgetSummary
             title="Сумма заработка"
-            total={1}
+            total={421200}
             color="error"
             icon={<img alt="icon" src="/assets/icons/wallet.svg" />}
           />

@@ -14,7 +14,7 @@ import { alpha, useTheme } from '@mui/material/styles';
 import InputAdornment from '@mui/material/InputAdornment';
 import { useNavigate } from 'react-router-dom';
 import { bgGradient } from 'src/theme/css';
-import Logo from 'src/components/logo';
+import LogoFlat from 'src/components/logo-flat';
 import Iconify from 'src/components/iconify';
 
 export default function RegisterView() {
@@ -121,7 +121,7 @@ export default function RegisterView() {
       }}
     >
       <Stack alignItems="center" justifyContent="center" sx={{ mx: 2, height: 1 }}>
-        <Logo
+        <LogoFlat
           sx={{
             mb: 4,
           }}

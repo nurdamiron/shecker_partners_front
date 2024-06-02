@@ -75,7 +75,9 @@ export default function Nav({ openNav, onCloseNav }) {
       <Avatar src={account.photoURL} alt="photoURL" />
 
       <Box sx={{ ml: 2 }}>
-        <Typography variant="subtitle2">{companyName}</Typography>
+        {/* <Typography variant="subtitle2">{companyName}</Typography> */}
+        <Typography variant="subtitle2">Shecker</Typography>
+
 
         <Typography variant="body2" sx={{ color: 'text.secondary' }}>
           {account.role}

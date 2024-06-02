@@ -15,7 +15,7 @@ import { alpha, useTheme } from '@mui/material/styles';
 import InputAdornment from '@mui/material/InputAdornment';
 import { useNavigate } from 'react-router-dom';
 import { bgGradient } from 'src/theme/css';
-import Logo from 'src/components/logo';
+import LogoFlat from 'src/components/logo-flat';
 import Iconify from 'src/components/iconify';
 
 export default function LoginView() {
@@ -64,14 +64,14 @@ export default function LoginView() {
       <Stack spacing={3}>
         <TextField
           name="email"
-          label="Username"
+          label="Эл. почта"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
         />
 
         <TextField
           name="password"
-          label="Password"
+          label="Пароль"
           type={showPassword ? 'text' : 'password'}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
@@ -118,7 +118,7 @@ export default function LoginView() {
       }}
     >
       <Stack alignItems="center" justifyContent="center" sx={{ mx: 3, height: 1 }}>
-        <Logo
+        <LogoFlat
           sx={{
             mb: 5,
           }}
@@ -139,44 +139,6 @@ export default function LoginView() {
               Зарегистрироваться
             </Link>
           </Typography>
-
-          <Stack direction="row" spacing={2}>
-            <Button
-              fullWidth
-              size="large"
-              color="inherit"
-              variant="outlined"
-              sx={{ borderColor: alpha(theme.palette.grey[500], 0.16) }}
-            >
-              <Iconify icon="eva:google-fill" color="#DF3E30" />
-            </Button>
-
-            <Button
-              fullWidth
-              size="large"
-              color="inherit"
-              variant="outlined"
-              sx={{ borderColor: alpha(theme.palette.grey[500], 0.16) }}
-            >
-              <Iconify icon="eva:facebook-fill" color="#1877F2" />
-            </Button>
-
-            <Button
-              fullWidth
-              size="large"
-              color="inherit"
-              variant="outlined"
-              sx={{ borderColor: alpha(theme.palette.grey[500], 0.16) }}
-            >
-              <Iconify icon="eva:twitter-fill" color="#1C9CEA" />
-            </Button>
-          </Stack>
-
-          <Divider sx={{ my: 3 }}>
-            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-              или 
-            </Typography>
-          </Divider>
 
           {renderForm}
         </Card>

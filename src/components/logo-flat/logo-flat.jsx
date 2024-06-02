@@ -8,7 +8,7 @@ import { RouterLink } from 'src/routes/components';
 
 // ----------------------------------------------------------------------
 
-const Logo = forwardRef(({ disabledLink = false, sx, ...other }, ref) => {
+const LogoFlat = forwardRef(({ disabledLink = false, sx, ...other }, ref) => {
 
   // const PRIMARY_LIGHT = theme.palette.primary.light;
 
@@ -21,8 +21,8 @@ const Logo = forwardRef(({ disabledLink = false, sx, ...other }, ref) => {
   const logo = (
     <Box
       component="img"
-      src="./logo.png"
-      sx={{ width: 200, height: 60, cursor: 'pointer', ...sx }}
+      src="./logo-flat.png"
+      sx={{ width: 150, height: 150, cursor: 'pointer', ...sx }}
     />
   );
 
@@ -85,9 +85,9 @@ const Logo = forwardRef(({ disabledLink = false, sx, ...other }, ref) => {
   );
 });
 
-Logo.propTypes = {
+LogoFlat.propTypes = {
   disabledLink: PropTypes.bool,
   sx: PropTypes.object,
 };
 
-export default Logo;
+export default LogoFlat;
