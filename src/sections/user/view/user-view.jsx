@@ -11,6 +11,11 @@ import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import TextField from '@mui/material/TextField';
 import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
 import TableNoData from '../table-no-data';
@@ -19,7 +24,6 @@ import UserTableHead from '../user-table-head';
 import TableEmptyRows from '../table-empty-rows';
 import UserTableToolbar from '../user-table-toolbar';
 import { emptyRows, applyFilter, getComparator } from '../utils';
-
 
 // Function to refresh access token
 const refreshAccessToken = async () => {
@@ -55,7 +59,7 @@ const fetchRefrigerators = async (setRefrigerators) => {
   try {
     let accessToken = localStorage.getItem('accessToken');
     const isTokenValid = await verifyAccessToken(accessToken);
-    
+
     if (!isTokenValid) {
       accessToken = await refreshAccessToken();
       if (!accessToken) {
@@ -83,6 +87,105 @@ const fetchRefrigerators = async (setRefrigerators) => {
   }
 };
 
+// Function to add a new user
+const addUser = async (userData) => {
+  try {
+    let accessToken = localStorage.getItem('accessToken');
+    const isTokenValid = await verifyAccessToken(accessToken);
+
+    if (!isTokenValid) {
+      accessToken = await refreshAccessToken();
+      if (!accessToken) {
+        throw new Error('Unable to refresh access token');
+      }
+    }
+
+    await axios.post('https://shecker-admin.com/api/fridge/admin/', userData, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+
+    alert('User added successfully!');
+  } catch (error) {
+    if (error.response) {
+      if (error.response.data.detail) {
+        alert(`Error: ${error.response.data.detail}`);
+      }
+    } else if (error.request) {
+      console.error('Error adding user: No response received');
+    } else {
+      console.error('Error adding user:', error.message);
+    }
+  }
+};
+
+// Function to update a user
+const updateUser = async (userData) => {
+  try {
+    let accessToken = localStorage.getItem('accessToken');
+    const isTokenValid = await verifyAccessToken(accessToken);
+
+    if (!isTokenValid) {
+      accessToken = await refreshAccessToken();
+      if (!accessToken) {
+        throw new Error('Unable to refresh access token');
+      }
+    }
+
+    await axios.put(`https://shecker-admin.com/api/fridge/admin/${userData.account}/`, userData, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+
+    alert('User updated successfully!');
+  } catch (error) {
+    if (error.response) {
+      if (error.response.data.detail) {
+        alert(`Error: ${error.response.data.detail}`);
+      }
+    } else if (error.request) {
+      console.error('Error updating user: No response received');
+    } else {
+      console.error('Error updating user:', error.message);
+    }
+  }
+};
+
+// Function to delete a user
+const deleteUser = async (accountId) => {
+  try {
+    let accessToken = localStorage.getItem('accessToken');
+    const isTokenValid = await verifyAccessToken(accessToken);
+
+    if (!isTokenValid) {
+      accessToken = await refreshAccessToken();
+      if (!accessToken) {
+        throw new Error('Unable to refresh access token');
+      }
+    }
+
+    await axios.delete(`https://shecker-admin.com/api/fridge/admin/${accountId}/`, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+
+    alert('User deleted successfully!');
+  } catch (error) {
+    if (error.response) {
+      if (error.response.data.detail) {
+        alert(`Error: ${error.response.data.detail}`);
+      }
+    } else if (error.request) {
+      console.error('Error deleting user: No response received');
+    } else {
+      console.error('Error deleting user:', error.message);
+    }
+  }
+};
+
 export default function UserPage() {
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('asc');
@@ -91,9 +194,13 @@ export default function UserPage() {
   const [filterName, setFilterName] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [refrigerators, setRefrigerators] = useState([]);
+  const [isAddUserOpen, setIsAddUserOpen] = useState(false);
+  const [isEditUserOpen, setIsEditUserOpen] = useState(false);
+  const [newUser, setNewUser] = useState({ account: '', description: '', address: '', owner: 0 });
+  const [editUser, setEditUser] = useState({ account: '', description: '', address: '', owner: 0 });
 
   const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
 
   useEffect(() => {
     fetchRefrigerators(setRefrigerators);
@@ -148,6 +255,52 @@ export default function UserPage() {
     setFilterName(event.target.value);
   };
 
+  const handleAddUserOpen = () => {
+    setIsAddUserOpen(true);
+  };
+
+  const handleAddUserClose = () => {
+    setIsAddUserOpen(false);
+    setNewUser({ account: '', description: '', address: '', owner: 0 });
+  };
+
+  const handleEditUserOpen = (user) => {
+    setEditUser(user);
+    setIsEditUserOpen(true);
+  };
+
+  const handleEditUserClose = () => {
+    setIsEditUserOpen(false);
+    setEditUser({ account: '', description: '', address: '', owner: 0 });
+  };
+
+  const handleUserChange = (event) => {
+    const { id, value } = event.target;
+    setNewUser({ ...newUser, [id]: value });
+  };
+
+  const handleEditUserChange = (event) => {
+    const { id, value } = event.target;
+    setEditUser({ ...editUser, [id]: value });
+  };
+
+  const handleAddUser = async () => {
+    await addUser(newUser);
+    handleAddUserClose();
+    fetchRefrigerators(setRefrigerators);
+  };
+
+  const handleEditUser = async () => {
+    await updateUser(editUser);
+    handleEditUserClose();
+    fetchRefrigerators(setRefrigerators);
+  };
+
+  const handleDeleteUser = async (account) => {
+    await deleteUser(account);
+    fetchRefrigerators(setRefrigerators);
+  };
+
   const dataFiltered = applyFilter({
     inputData: refrigerators,
     comparator: getComparator(order, orderBy),
@@ -160,7 +313,12 @@ export default function UserPage() {
     <Container>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
         <Typography variant="h4">Пользователи</Typography>
-        <Button variant="contained" color="inherit" startIcon={<Iconify icon="eva:plus-fill" />}>
+        <Button
+          variant="contained"
+          color="inherit"
+          startIcon={<Iconify icon="eva:plus-fill" />}
+          onClick={handleAddUserOpen}
+        >
           Добавить
         </Button>
       </Stack>
@@ -170,6 +328,7 @@ export default function UserPage() {
           numSelected={selected.length}
           filterName={filterName}
           onFilterName={handleFilterByName}
+          onDelete={() => selected.forEach(handleDeleteUser)}
         />
 
         <Scrollbar>
@@ -183,10 +342,9 @@ export default function UserPage() {
                 onRequestSort={handleSort}
                 onSelectAllClick={handleSelectAllClick}
                 headLabel={[
-                  { id: 'account', label: 'Account' },
-                  { id: 'description', label: 'Description' },
-                  { id: 'address', label: 'Address' },
-                  { id: 'owner', label: 'Owner', align: 'center' },
+                  { id: 'account', label: 'ID' },
+                  { id: 'address', label: 'Адрес' },
+                  { id: 'owner', label: 'Владелец', align: 'center' },
                 ]}
               />
               <TableBody>
@@ -201,6 +359,8 @@ export default function UserPage() {
                       owner={row.owner}
                       selected={selected.indexOf(row.account) !== -1}
                       handleClick={(event) => handleClick(event, row.account)}
+                      handleEdit={() => handleEditUserOpen(row)}
+                      handleDelete={() => handleDeleteUser(row.account)}
                     />
                   ))}
 
@@ -225,6 +385,88 @@ export default function UserPage() {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Card>
+
+      {/* Add User Modal */}
+      <Dialog open={isAddUserOpen} onClose={handleAddUserClose}>
+        <DialogTitle>Добавить пользователя</DialogTitle>
+        <DialogContent>
+          <Stack spacing={2}>
+            <TextField
+              label="ID"
+              id="account"
+              value={newUser.account}
+              onChange={handleUserChange}
+            />
+            <TextField
+              label="Описание"
+              id="description"
+              value={newUser.description}
+              onChange={handleUserChange}
+            />
+            <TextField
+              label="Адрес"
+              id="address"
+              value={newUser.address}
+              onChange={handleUserChange}
+            />
+            <TextField
+              label="Владелец"
+              id="owner"
+              value={newUser.owner}
+              onChange={handleUserChange}
+            />
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleAddUserClose} color="primary">
+            Отмена
+          </Button>
+          <Button onClick={handleAddUser} color="primary">
+            Добавить
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Edit User Modal */}
+      <Dialog open={isEditUserOpen} onClose={handleEditUserClose}>
+        <DialogTitle>Изменить данные пользователя</DialogTitle>
+        <DialogContent>
+          <Stack spacing={2}>
+            <TextField
+              label="ID"
+              id="account"
+              value={editUser.account}
+              onChange={handleEditUserChange}
+            />
+            <TextField
+              label="Описание"
+              id="description"
+              value={editUser.description}
+              onChange={handleEditUserChange}
+            />
+            <TextField
+              label="Адрес"
+              id="address"
+              value={editUser.address}
+              onChange={handleEditUserChange}
+            />
+            <TextField
+              label="Владелец"
+              id="owner"
+              value={editUser.owner}
+              onChange={handleEditUserChange}
+            />
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleEditUserClose} color="primary">
+            Отмена
+          </Button>
+          <Button onClick={handleEditUser} color="primary">
+            Сохранить
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 }

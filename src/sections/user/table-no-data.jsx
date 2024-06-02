@@ -17,13 +17,12 @@ export default function TableNoData({ query }) {
           }}
         >
           <Typography variant="h6" paragraph>
-            Not found
+            Не найдено
           </Typography>
 
           <Typography variant="body2">
-            No results found for &nbsp;
+            Нету результатов по запросу &nbsp;
             <strong>&quot;{query}&quot;</strong>.
-            <br /> Try checking for typos or using complete words.
           </Typography>
         </Paper>
       </TableCell>

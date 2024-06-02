@@ -1,9 +1,8 @@
 {
-  "name": "@minimal/material-kit-react",
-  "author": "minimals.cc",
-  "licence": "MIT",
-  "version": "1.8.0",
+  "name": "shecker_partners",
+  "version": "1.0.0",
   "private": false,
+  "proxy": "https://shecker-admin.com",
   "scripts": {
     "dev": "vite",
     "start": "vite preview",

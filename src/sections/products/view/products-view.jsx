@@ -48,7 +48,7 @@ const fetchProductById = async (id) => {
   try {
     let accessToken = localStorage.getItem('accessToken');
     const isTokenValid = await verifyAccessToken(accessToken);
-    
+
     if (!isTokenValid) {
       accessToken = await refreshAccessToken();
       if (!accessToken) {
@@ -74,7 +74,7 @@ const fetchProducts = async (setProducts) => {
   try {
     let accessToken = localStorage.getItem('accessToken');
     const isTokenValid = await verifyAccessToken(accessToken);
-    
+
     if (!isTokenValid) {
       accessToken = await refreshAccessToken();
       if (!accessToken) {
@@ -107,12 +107,70 @@ const fetchProducts = async (setProducts) => {
   }
 };
 
+// Function to add a new product
+const addProduct = async (productData, setProducts, handleCloseAddModal) => {
+  try {
+    let accessToken = localStorage.getItem('accessToken');
+    const isTokenValid = await verifyAccessToken(accessToken);
+
+    if (!isTokenValid) {
+      accessToken = await refreshAccessToken();
+      if (!accessToken) {
+        throw new Error('Unable to refresh access token');
+      }
+    }
+
+    const response = await axios.post('https://shecker-admin.com/api/product/admin/', productData, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+
+    setProducts(prevProducts => [...prevProducts, response.data]);
+    handleCloseAddModal();
+  } catch (error) {
+    console.error('Error adding product:', error);
+    if (error.response && error.response.data.detail) {
+      console.error('Server response:', error.response.data.detail);
+    }
+  }
+};
+
+// Function to delete a product
+const deleteProduct = async (id, setProducts) => {
+  try {
+    let accessToken = localStorage.getItem('accessToken');
+    const isTokenValid = await verifyAccessToken(accessToken);
+
+    if (!isTokenValid) {
+      accessToken = await refreshAccessToken();
+      if (!accessToken) {
+        throw new Error('Unable to refresh access token');
+      }
+    }
+
+    await axios.delete(`https://shecker-admin.com/api/product/admin/${id}`, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+
+    setProducts(prevProducts => prevProducts.filter(product => product.id !== id));
+  } catch (error) {
+    console.error('Error deleting product:', error);
+    if (error.response && error.response.data.detail) {
+      console.error('Server response:', error.response.data.detail);
+    }
+  }
+};
+
 // ----------------------------------------------------------------------
 
 export default function ProductsView() {
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [openModal, setOpenModal] = useState(false);
+  const [openAddModal, setOpenAddModal] = useState(false);
   const [imageFile, setImageFile] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
@@ -126,7 +184,7 @@ export default function ProductsView() {
   }, []);
 
   const handleDeleteProduct = (id) => {
-    setProducts(products.filter(product => product.id !== id));
+    deleteProduct(id, setProducts);
   };
 
   const handleEditProduct = async (product) => {
@@ -146,6 +204,21 @@ export default function ProductsView() {
   const handleCloseModal = () => {
     setOpenModal(false);
     setSelectedProduct(null);
+    setImageFile(null);
+  };
+
+  const handleOpenAddModal = () => {
+    setOpenAddModal(true);
+  };
+
+  const handleCloseAddModal = () => {
+    setOpenAddModal(false);
+    setFormData({
+      name: '',
+      description: '',
+      price: '',
+      image: '',
+    });
     setImageFile(null);
   };
 
@@ -186,6 +259,34 @@ export default function ProductsView() {
     }
   };
 
+  const handleAddProduct = async () => {
+    let imageUrl = '';
+
+    if (imageFile) {
+      const storageRef = ref(storage, `products/${imageFile.name}`);
+      const uploadTask = uploadBytesResumable(storageRef, imageFile);
+
+      uploadTask.on(
+        'state_changed',
+        (snapshot) => {
+          console.log('Upload is in progress...');
+        },
+        (error) => {
+          console.error('Error uploading image:', error);
+        },
+        async () => {
+          imageUrl = await getDownloadURL(uploadTask.snapshot.ref);
+          console.log('Image URL:', imageUrl); // Log the image URL for debugging
+          const productData = { ...formData, image: imageUrl };
+          await addProduct(productData, setProducts, handleCloseAddModal);
+        }
+      );
+    } else {
+      const productData = { ...formData, image: imageUrl };
+      await addProduct(productData, setProducts, handleCloseAddModal);
+    }
+  };
+
   const updateProduct = async (imageUrl) => {
     try {
       let accessToken = localStorage.getItem('accessToken');
@@ -223,7 +324,7 @@ export default function ProductsView() {
         <Typography variant="h4">
           Продукты
         </Typography>
-        <Button variant="contained" color="inherit" startIcon={<Iconify icon="eva:plus-fill" />}>
+        <Button variant="contained" color="inherit" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleOpenAddModal}>
           Добавить продукт
         </Button>
       </Stack>
@@ -237,7 +338,7 @@ export default function ProductsView() {
       </Grid>
 
       <Modal open={openModal} onClose={handleCloseModal}>
-        <div style={{ padding: 20, backgroundColor: 'white', borderRadius: 8, width: '400px' }}>
+        <div style={{ padding: 20, backgroundColor: 'white', borderRadius: 8, width: '400px', margin: 'auto', marginTop: '10%' }}>
           <Typography variant="h6" gutterBottom>
             Изменить данные продукта
           </Typography>
@@ -275,6 +376,49 @@ export default function ProductsView() {
           <Stack direction="row" spacing={2} justifyContent="flex-end">
             <Button onClick={handleCloseModal}>Cancel</Button>
             <Button variant="contained" onClick={handleUpdateProduct}>Save</Button>
+          </Stack>
+        </div>
+      </Modal>
+
+      <Modal open={openAddModal} onClose={handleCloseAddModal}>
+        <div style={{ padding: 20, backgroundColor: 'white', borderRadius: 8, width: '400px', margin: 'auto', marginTop: '10%' }}>
+          <Typography variant="h6" gutterBottom>
+            Добавить продукт
+          </Typography>
+          <TextField
+            fullWidth
+            label="Product Name"
+            name="name"
+            value={formData.name}
+            onChange={handleInputChange}
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            fullWidth
+            label="Description"
+            name="description"
+            value={formData.description}
+            onChange={handleInputChange}
+            multiline
+            rows={4}
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            fullWidth
+            label="Price"
+            name="price"
+            type="number"
+            value={formData.price}
+            onChange={handleInputChange}
+            sx={{ mb: 2 }}
+          />
+          <Button variant="contained" component="label" sx={{ mb: 2 }}>
+            Upload Image
+            <input type="file" hidden onChange={handleImageChange} />
+          </Button>
+          <Stack direction="row" spacing={2} justifyContent="flex-end">
+            <Button onClick={handleCloseAddModal}>Cancel</Button>
+            <Button variant="contained" onClick={handleAddProduct}>Add</Button>
           </Stack>
         </div>
       </Modal>
