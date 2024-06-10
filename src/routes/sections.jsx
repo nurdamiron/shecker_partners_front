@@ -9,7 +9,9 @@ export const FridgePage = lazy(() => import('src/pages/fridge'));
 export const UserPage = lazy(() => import('src/pages/user'));
 export const LoginPage = lazy(() => import('src/pages/login'));
 export const RegisterPage = lazy(() => import('src/pages/register'));
-export const ProductsPage = lazy(() => import('src/pages/products'));
+export const VerificationPage = lazy(() => import('src/pages/verification'));
+export const FridgeProductsPage = lazy(() => import('src/pages/fridge-product'));
+export const AssortmentPage = lazy(() => import('src/pages/assortment'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
 
 export default function Router() {
@@ -27,8 +29,9 @@ export default function Router() {
       children: [
         { element: <IndexPage />, index: true },
         { path: 'user', element: <UserPage /> },
-        { path: 'products', element: <ProductsPage /> },
+        { path: 'assortment', element: <AssortmentPage /> },
         { path: 'fridge', element: <FridgePage /> },
+        { path: 'fridge-product', element: <FridgeProductsPage /> },
       ],
     },
     {
@@ -38,6 +41,10 @@ export default function Router() {
     {
       path: 'register',
       element: <RegisterPage />,
+    },
+    {
+      path: 'verification',
+      element: <VerificationPage />,
     },
     {
       path: '404',

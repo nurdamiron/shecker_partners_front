@@ -190,14 +190,14 @@ export default function UserPage() {
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('asc');
   const [selected, setSelected] = useState([]);
-  const [orderBy, setOrderBy] = useState('name');
+  const [orderBy, setOrderBy] = useState('account');
   const [filterName, setFilterName] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [refrigerators, setRefrigerators] = useState([]);
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
   const [isEditUserOpen, setIsEditUserOpen] = useState(false);
-  const [newUser, setNewUser] = useState({ account: '', description: '', address: '', owner: 0 });
-  const [editUser, setEditUser] = useState({ account: '', description: '', address: '', owner: 0 });
+  const [newUser, setNewUser] = useState({ account: '', address: '', owner: '' });
+  const [editUser, setEditUser] = useState({ account: '', address: '', owner: '' });
 
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
@@ -208,10 +208,8 @@ export default function UserPage() {
 
   const handleSort = (event, id) => {
     const isAsc = orderBy === id && order === 'asc';
-    if (id !== '') {
-      setOrder(isAsc ? 'desc' : 'asc');
-      setOrderBy(id);
-    }
+    setOrder(isAsc ? 'desc' : 'asc');
+    setOrderBy(id);
   };
 
   const handleSelectAllClick = (event) => {
@@ -261,7 +259,7 @@ export default function UserPage() {
 
   const handleAddUserClose = () => {
     setIsAddUserOpen(false);
-    setNewUser({ account: '', description: '', address: '', owner: 0 });
+    setNewUser({ account: '', address: '', owner: '' });
   };
 
   const handleEditUserOpen = (user) => {
@@ -271,7 +269,7 @@ export default function UserPage() {
 
   const handleEditUserClose = () => {
     setIsEditUserOpen(false);
-    setEditUser({ account: '', description: '', address: '', owner: 0 });
+    setEditUser({ account: '', address: '', owner: '' });
   };
 
   const handleUserChange = (event) => {
@@ -354,7 +352,6 @@ export default function UserPage() {
                     <UserTableRow
                       key={row.account}
                       account={row.account}
-                      description={row.description}
                       address={row.address}
                       owner={row.owner}
                       selected={selected.indexOf(row.account) !== -1}
@@ -398,12 +395,6 @@ export default function UserPage() {
               onChange={handleUserChange}
             />
             <TextField
-              label="Описание"
-              id="description"
-              value={newUser.description}
-              onChange={handleUserChange}
-            />
-            <TextField
               label="Адрес"
               id="address"
               value={newUser.address}
@@ -436,12 +427,6 @@ export default function UserPage() {
               label="ID"
               id="account"
               value={editUser.account}
-              onChange={handleEditUserChange}
-            />
-            <TextField
-              label="Описание"
-              id="description"
-              value={editUser.description}
               onChange={handleEditUserChange}
             />
             <TextField

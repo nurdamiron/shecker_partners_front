@@ -8,7 +8,7 @@ export default function LoginPage() {
   return (
     <>
       <Helmet>
-        <title> Login | Shecker Partners </title>
+        <title> Авторизация | Shecker Partners </title>
       </Helmet>
 
       <LoginView />

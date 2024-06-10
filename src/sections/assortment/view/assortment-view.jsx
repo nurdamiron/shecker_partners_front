@@ -166,7 +166,7 @@ const deleteProduct = async (id, setProducts) => {
 
 // ----------------------------------------------------------------------
 
-export default function ProductsView() {
+export default function AssortmentView() {
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [openModal, setOpenModal] = useState(false);

@@ -13,7 +13,7 @@ import ProductCartWidget from '../product-cart-widget';
 
 // ----------------------------------------------------------------------
 
-export default function ProductsView() {
+export default function AssortmentView() {
   const [openFilter, setOpenFilter] = useState(false);
   const [products, setProducts] = useState([]);
   const [detailedProducts, setDetailedProducts] = useState([]);

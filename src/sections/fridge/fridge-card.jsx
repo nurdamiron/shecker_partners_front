@@ -4,11 +4,13 @@ import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
 import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
+import Switch from '@mui/material/Switch';
 import { useState, useEffect } from 'react';
 import { ref, onValue, get, set } from 'firebase/database';
 import { database } from 'src/firebase_config'; // Adjust the import path according to your file structure
 import LocationOnIcon from '@mui/icons-material/LocationOn'; // Import location icon
+import LockOpenIcon from '@mui/icons-material/LockOpen';
+import LockIcon from '@mui/icons-material/Lock';
 
 export default function FridgeCard({ fridge, index }) {
   const { account, address, id } = fridge;
@@ -47,7 +49,7 @@ export default function FridgeCard({ fridge, index }) {
       }).catch((error) => {
         console.error('Error fetching timer:', error);
       });
-    }, 15000);
+    }, 11000);
 
     return () => {
       clearInterval(intervalId);
@@ -56,30 +58,39 @@ export default function FridgeCard({ fridge, index }) {
     };
   }, [id, lastTimer]);
 
-  const handleOpenDoor = () => {
-    set(ref(database, `${id}/door/doorOpen`), 1);
-  };
-
-  const handleCloseDoor = () => {
-    set(ref(database, `${id}/door/doorOpen`), 0);
+  const handleToggleDoor = () => {
+    const newDoorStatus = doorStatus === 0 ? 1 : 0;
+    set(ref(database, `${id}/door/doorOpen`), newDoorStatus);
   };
 
   const renderAccount = (
-    <Typography
-      variant="h3"
+    <Box
       sx={{
-        height: 44,
+        display: 'flex',
+        alignItems: 'center',
+      }}
+    >
+    <Typography
+      variant="h2"
+      sx={{
+        height: 50,
         overflow: 'hidden',
         WebkitLineClamp: 2,
         display: '-webkit-box',
         WebkitBoxOrient: 'vertical',
         color: 'common.black',
+        marginRight: 1, // Add margin to the right
       }}
     >
       {account}
     </Typography>
+    <Typography variant="caption">
+    {doorStatus ? <LockOpenIcon /> : <LockIcon />}
+    </Typography>
+    </Box>
   );
 
+  
   const renderInfo = (
     <Box
       sx={{
@@ -89,7 +100,7 @@ export default function FridgeCard({ fridge, index }) {
         mt: 2,
       }}
     >
-      <LocationOnIcon style={{fontSize: "18px"}} />
+      <LocationOnIcon style={{ fontSize: "20px" }} />
       <Typography variant="caption">{address}</Typography>
     </Box>
   );
@@ -113,21 +124,22 @@ export default function FridgeCard({ fridge, index }) {
           sx={{
             p: 4,
             width: 1,
-            bottom: 0,
+            bottom: 10,
             position: 'relative',
           }}
         >
           {renderAccount}
           {renderInfo}
-          <Typography variant="caption"> {doorStatus ? 'Открыт' : 'Закрыт'}</Typography>
+          
           {isAvailable ? (
             <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
-              <Button variant="contained" color="primary" onClick={handleOpenDoor}>
-                Открыть дверь
-              </Button>
-              <Button variant="contained" color="secondary" onClick={handleCloseDoor}>
-                Закрыть дверь
-              </Button>
+              <Switch
+                checked={doorStatus !== 0}
+                onChange={handleToggleDoor}
+                name="doorStatusSwitch"
+                color="primary"
+              />
+              
             </Stack>
           ) : (
             <Typography variant="h6" color="error">

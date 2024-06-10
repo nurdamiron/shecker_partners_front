@@ -47,7 +47,6 @@ export default function UserTableRow({
           </Stack>
         </TableCell>
 
-        <TableCell>{description}</TableCell>
 
         <TableCell>{address}</TableCell>
 
@@ -71,12 +70,12 @@ export default function UserTableRow({
         }}
       >
         <MenuItem onClick={handleCloseMenu}>
-          <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
+          <Iconify icon="eva:edit-fill" sx={{ mr: 0 }} />
           Изменить
         </MenuItem>
 
         <MenuItem onClick={handleCloseMenu} sx={{ color: 'error.main' }}>
-          <Iconify icon="eva:trash-2-outline" sx={{ mr: 2 }} />
+          <Iconify icon="eva:trash-2-outline" sx={{ mr: 0 }} />
           Удалить
         </MenuItem>
       </Popover>

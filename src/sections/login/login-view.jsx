@@ -24,9 +24,11 @@ export default function LoginView() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleLogin = async () => {
     setLoading(true);
+    setError(null);
     try {
       const response = await axios.post('https://shecker-admin.com/api/auth/sign-in', {
         username,
@@ -40,14 +42,16 @@ export default function LoginView() {
         token: access,
       });
 
-      // Store tokens and username (you may want to use a more secure storage method)
+      // Store tokens and username
       localStorage.setItem('accessToken', access);
       localStorage.setItem('refreshToken', refresh);
       localStorage.setItem('username', username);
 
+      // User is authenticated and active
       navigate('/');
-    } catch (error) {
-      console.error('Login failed:', error);
+    } catch (err) {
+      console.error('Login failed:', err);
+      setError('Ошибка авторизации.');
     } finally {
       setLoading(false);
     }
@@ -102,6 +106,12 @@ export default function LoginView() {
       >
         Войти
       </LoadingButton>
+
+      {error && (
+        <Typography variant="body2" color="error" sx={{ mt: 2 }}>
+          {error}
+        </Typography>
+      )}
     </Box>
   );
 

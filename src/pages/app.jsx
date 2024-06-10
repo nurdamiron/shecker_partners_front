@@ -8,7 +8,7 @@ export default function AppPage() {
   return (
     <>
       <Helmet>
-        <title> Dashboard | Shecker Partners </title>
+        <title> Дэшборд | Shecker Partners </title>
       </Helmet>
 
       <AppView />

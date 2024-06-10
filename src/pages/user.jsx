@@ -8,7 +8,7 @@ export default function UserPage() {
   return (
     <>
       <Helmet>
-        <title> User | Shecker Partners </title>
+        <title> Пользователи | Shecker Partners </title>
       </Helmet>
 
       <UserView />

@@ -4,7 +4,7 @@ import { RegisterView } from 'src/sections/register';
 
 // ----------------------------------------------------------------------
 
-export default function LoginPage() {
+export default function RegisterPage() {
   return (
     <>
       <Helmet>

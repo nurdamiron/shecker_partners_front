@@ -18,8 +18,8 @@ const navConfig = [
     icon: icon('ic_user'),
   },
   {
-    title: 'Продукты',
-    path: '/products',
+    title: 'Ассортимент',
+    path: '/assortment',
     icon: icon('ic_cart'),
   },
   {
@@ -27,6 +27,12 @@ const navConfig = [
     path: '/fridge',
     icon: icon('ic_blog'),
   },
+  {
+    title: 'Управление продуктами',
+    path: '/fridge-product',
+    icon: icon('ic_blog'),
+  },
+
 ];
 
 export default navConfig;

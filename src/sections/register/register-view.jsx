@@ -1,11 +1,8 @@
-// src/sections/RegisterView.jsx
 import { useState } from 'react';
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
-// import Button from '@mui/material/Button';
-// import Divider from '@mui/material/Divider';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
@@ -24,45 +21,83 @@ export default function RegisterView() {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
-    companyName: '',
+    company: '',
     password: '',
     password2: ''
   });
+  const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async () => {
-    const response = await fetch('https://shecker-admin.com/api/auth/sign-up', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(formData)
-    });
-    if (response.ok) {
-      const data = await response.json();
-      // Store the email and username in localStorage
-      localStorage.setItem('email', data.email);
-      localStorage.setItem('company', data.companyName);
-      navigate('/login');
-    } else {
-      console.error('Registration failed');
+    const { email, company, password, password2 } = formData;
+  
+    // Validate form data
+    const newErrors = {};
+    if (!email) newErrors.email = 'Эл. почта обязательна';
+    if (!company) newErrors.company = 'Название предприятия обязательно';
+    if (!password) newErrors.password = 'Пароль обязателен';
+    if (password !== password2) newErrors.password2 = 'Пароли не совпадают';
+  
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+  
+    try {
+      const response = await fetch('https://shecker-admin.com/api/auth/sign-up', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, company, password, password2 })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        // Store the email and company name in localStorage
+        localStorage.setItem('email', data.email);
+        localStorage.setItem('company', data.company);
+        navigate('/verification');
+      } else {
+        const errorData = await response.json();
+        setErrors(errorData);
+      }
+    } catch (error) {
+      console.error('Registration failed:', error);
     }
   };
+  
 
   const renderForm = (
     <Box>
       <Stack spacing={3}>
-        <TextField name="email" label="Эл. почта" value={formData.email} onChange={handleChange} />
-        <TextField name="companyName" label="Название предприятия" value={formData.companyName} onChange={handleChange} />
+        <TextField
+          name="email"
+          label="Эл. почта"
+          value={formData.email}
+          onChange={handleChange}
+          error={!!errors.email}
+          helperText={errors.email}
+        />
+        <TextField
+          name="company"
+          label="Название предприятия"
+          value={formData.company}
+          onChange={handleChange}
+          error={!!errors.company}
+          helperText={errors.company}
+        />
         <TextField
           name="password"
           label="Пароль"
           type={showPassword ? 'text' : 'password'}
           value={formData.password}
           onChange={handleChange}
+          error={!!errors.password}
+          helperText={errors.password}
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
@@ -79,6 +114,8 @@ export default function RegisterView() {
           type={showPassword ? 'text' : 'password'}
           value={formData.password2}
           onChange={handleChange}
+          error={!!errors.password2}
+          helperText={errors.password2}
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
@@ -92,7 +129,7 @@ export default function RegisterView() {
       </Stack>
 
       <Stack direction="row" alignItems="center" justifyContent="flex-end" sx={{ my: 3 }}>
-        <Link variant="subtitle2" underline="hover">
+        <Link variant="subtitle2" underline="hover" onClick={() => navigate('/forgot-password')}>
           Забыли пароль?
         </Link>
       </Stack>
@@ -142,44 +179,6 @@ export default function RegisterView() {
               Войти
             </Link>
           </Typography>
-
-          {/* <Stack direction="row" spacing={2}>
-            <Button
-              fullWidth
-              size="large"
-              color="inherit"
-              variant="outlined"
-              sx={{ borderColor: alpha(theme.palette.grey[500], 0.16) }}
-            >
-              <Iconify icon="eva:google-fill" color="#DF3E30" />
-            </Button>
-
-            <Button
-              fullWidth
-              size="large"
-              color="inherit"
-              variant="outlined"
-              sx={{ borderColor: alpha(theme.palette.grey[500], 0.16) }}
-            >
-              <Iconify icon="eva:facebook-fill" color="#1877F2" />
-            </Button>
-
-            <Button
-              fullWidth
-              size="large"
-              color="inherit"
-              variant="outlined"
-              sx={{ borderColor: alpha(theme.palette.grey[500], 0.16) }}
-            >
-              <Iconify icon="eva:twitter-fill" color="#1C9CEA" />
-            </Button>
-          </Stack>
-
-          <Divider sx={{ my: 3 }}>
-            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-              или
-            </Typography>
-          </Divider> */}
 
           {renderForm}
         </Card>

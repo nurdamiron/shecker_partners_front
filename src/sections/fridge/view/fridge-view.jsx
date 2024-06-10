@@ -85,14 +85,14 @@ export default function FridgeView() {
   const handleSort = useCallback((event) => {
     const selectedSortType = event.target.value;
     setSortType(selectedSortType);
-
+  
     const sorted = [...fridges].sort((a, b) => {
       if (selectedSortType === 'number') {
-        return a.account.localeCompare(b.account);
+        return parseInt(a.account, 10) - parseInt(b.account, 10);
       }
       if (selectedSortType === 'availability') {
         if (a.isAvailable === b.isAvailable) {
-          return a.account.localeCompare(b.account);
+          return parseInt(a.account, 10) - parseInt(b.account, 10);
         }
         return a.isAvailable ? -1 : 1;
       }
@@ -104,9 +104,10 @@ export default function FridgeView() {
       }
       return 0;
     });
-
+  
     setSortedFridges(sorted);
   }, [fridges]);
+  
 
   useEffect(() => {
     handleSort({ target: { value: 'availability' } });
