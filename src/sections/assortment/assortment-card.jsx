@@ -20,10 +20,10 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 // ----------------------------------------------------------------------
 
-export default function ShopProductCard({ product, onDelete }) {
+export default function AssortmentCard({ assortment, onDelete }) {
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const [editedProduct, setEditedProduct] = useState({ ...product });
+  const [editedAssortment, setEditedAssortment] = useState({ ...assortment });
   const [uploading, setUploading] = useState(false);
 
   const handleEditOpen = () => {
@@ -45,7 +45,7 @@ export default function ShopProductCard({ product, onDelete }) {
   const handleSave = async () => {
     try {
       const accessToken = localStorage.getItem('accessToken');
-      await axios.patch(`https://shecker-admin.com/api/product/admin/${product.id}/`, editedProduct, {
+      await axios.patch(`https://shecker-admin.com/api/product/admin/${assortment.id}/`, editedAssortment, {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json'
@@ -60,12 +60,12 @@ export default function ShopProductCard({ product, onDelete }) {
   const handleDelete = async () => {
     try {
       const accessToken = localStorage.getItem('accessToken');
-      await axios.delete(`https://shecker-admin.com/api/product/admin/${product.id}/`, {
+      await axios.delete(`https://shecker-admin.com/api/product/admin/${assortment.id}/`, {
         headers: {
           'Authorization': `Bearer ${accessToken}`
         }
       });
-      onDelete(product.id); // Notify parent component to remove the product from the list
+      onDelete(assortment.id); // Notify parent component to remove the product from the list
       handleDeleteClose();
     } catch (error) {
       console.error('Error deleting product:', error);
@@ -74,7 +74,7 @@ export default function ShopProductCard({ product, onDelete }) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setEditedProduct((prev) => ({ ...prev, [name]: value }));
+    setEditedAssortment((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleUpload = async (e) => {
@@ -87,7 +87,7 @@ export default function ShopProductCard({ product, onDelete }) {
     try {
       await uploadBytes(storageRef, file);
       const url = await getDownloadURL(storageRef);
-      setEditedProduct((prev) => ({ ...prev, image: url }));
+      setEditedAssortment((prev) => ({ ...prev, image: url }));
     } catch (error) {
       console.error('Error uploading image:', error);
     } finally {
@@ -98,8 +98,8 @@ export default function ShopProductCard({ product, onDelete }) {
   const renderImg = (
     <Box
       component="img"
-      alt={product.name}
-      src={product.image}
+      alt={assortment.name}
+      src={assortment.image}
       sx={{
         maxHeight: 200, // ограничиваем высоту изображения
         maxWidth: '100%',
@@ -111,7 +111,7 @@ export default function ShopProductCard({ product, onDelete }) {
 
   const renderPrice = (
     <Typography variant="subtitle1" style={{fontSize: '20px'}}>
-      {(product.price)} KZT
+      {(assortment.price)} KZT
     </Typography>
   );
 
@@ -122,10 +122,10 @@ export default function ShopProductCard({ product, onDelete }) {
       </Box>
       <Stack spacing={2} sx={{ p: 2 }}>
       <Typography variant="body2" noWrap>
-          {product.name}
+          {assortment.name}
         </Typography>
         <Typography variant="body2" noWrap>
-          {product.description}
+          {assortment.description}
         </Typography>
         {renderPrice}
         <Stack direction="row" spacing={1}>
@@ -148,21 +148,21 @@ export default function ShopProductCard({ product, onDelete }) {
           <TextField
             margin="dense"
             name="name"
-            label="Product Name"
+            label="Название"
             type="text"
             fullWidth
             variant="standard"
-            value={editedProduct.name}
+            value={editedAssortment.name}
             onChange={handleChange}
           />
           <TextField
             margin="dense"
             name="description"
-            label="Description"
+            label="Описание"
             type="text"
             fullWidth
             variant="standard"
-            value={editedProduct.description}
+            value={editedAssortment.description}
             onChange={handleChange}
           />
           <TextField
@@ -172,7 +172,7 @@ export default function ShopProductCard({ product, onDelete }) {
             type="number"
             fullWidth
             variant="standard"
-            value={editedProduct.price}
+            value={editedAssortment.price}
             onChange={handleChange}
           />
           <TextField
@@ -182,7 +182,7 @@ export default function ShopProductCard({ product, onDelete }) {
             type="text"
             fullWidth
             variant="standard"
-            value={editedProduct.image}
+            value={editedAssortment.image}
             onChange={handleChange}
             InputProps={{
               readOnly: true,
@@ -233,7 +233,7 @@ export default function ShopProductCard({ product, onDelete }) {
   );
 }
 
-ShopProductCard.propTypes = {
-  product: PropTypes.object.isRequired,
+AssortmentCard.propTypes = {
+  assortment: PropTypes.object.isRequired,
   onDelete: PropTypes.func.isRequired,
 };

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
@@ -77,6 +78,7 @@ export default function FridgeView() {
   const [fridges, setFridges] = useState([]);
   const [sortedFridges, setSortedFridges] = useState([]);
   const [sortType, setSortType] = useState('availability');
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchFridges(setFridges);
@@ -107,7 +109,10 @@ export default function FridgeView() {
   
     setSortedFridges(sorted);
   }, [fridges]);
-  
+
+  const handleManageClick = (fridgeId) => {
+    navigate(`/fridge-detail/${fridgeId}`);
+  };
 
   useEffect(() => {
     handleSort({ target: { value: 'availability' } });
@@ -123,7 +128,6 @@ export default function FridgeView() {
       </Stack>
 
       <Stack mb={5} direction="row" alignItems="center" justifyContent="space-between" spacing={2}>
-        {/* <FridgeSearch fridge={fridges} /> */}
         <FridgeSort 
           options={[
             { value: 'number', label: 'По номеру' },
@@ -132,7 +136,7 @@ export default function FridgeView() {
             { value: 'owner', label: 'По владельцу' },
           ]}
           onSort={handleSort}
-          value={sortType} // Set the default selected value
+          value={sortType}
         />
       </Stack>
 
@@ -143,9 +147,10 @@ export default function FridgeView() {
               key={fridge.account}
               fridge={{
                 ...fridge,
-                id: fridge.account, // Assuming account corresponds to the index for Firebase path
+                id: fridge.account,
               }}
               index={index}
+              onManageClick={() => handleManageClick(fridge.account)}
             />
           ))}
         </Grid>

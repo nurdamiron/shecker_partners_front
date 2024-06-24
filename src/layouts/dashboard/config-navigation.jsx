@@ -29,7 +29,7 @@ const navConfig = [
   },
   {
     title: 'Управление продуктами',
-    path: '/fridge-product',
+    path: '/product',
     icon: icon('ic_blog'),
   },
 

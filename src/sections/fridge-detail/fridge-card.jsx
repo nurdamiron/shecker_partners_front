@@ -12,12 +12,14 @@ import { database } from 'src/firebase_config';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
 import LockIcon from '@mui/icons-material/Lock';
+import { useNavigate } from 'react-router-dom';
 
-export default function FridgeCard({ fridge, onManageClick }) {
+export default function FridgeCard({ fridge, index }) {
   const { account, address, id } = fridge;
   const [doorStatus, setDoorStatus] = useState(0);
   const [isAvailable, setIsAvailable] = useState(false);
   const [lastTimer, setLastTimer] = useState(0);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fridgeRef = ref(database, `${id}/timer/timer`);
@@ -54,6 +56,10 @@ export default function FridgeCard({ fridge, onManageClick }) {
     };
   }, [id, lastTimer]);
 
+  const handleManageFridge = () => {
+    navigate(`/fridge-detail/${id}`);
+  };
+  
   const handleToggleDoor = () => {
     const newDoorStatus = doorStatus === 0 ? 1 : 0;
     set(ref(database, `${id}/door/doorOpen`), newDoorStatus);
@@ -133,7 +139,7 @@ export default function FridgeCard({ fridge, onManageClick }) {
                 name="doorStatusSwitch"
                 color="primary"
               />
-              <Button onClick={onManageClick}>Управление</Button>
+              <Button onClick={handleManageFridge}>Управление</Button>
             </Stack>
           ) : (
             <Typography variant="h6" color="error">
@@ -148,5 +154,5 @@ export default function FridgeCard({ fridge, onManageClick }) {
 
 FridgeCard.propTypes = {
   fridge: PropTypes.object.isRequired,
-  onManageClick: PropTypes.func.isRequired,
+  index: PropTypes.number,
 };

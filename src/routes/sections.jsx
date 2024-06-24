@@ -6,12 +6,13 @@ import PrivateRoute from './private_router';
 
 export const IndexPage = lazy(() => import('src/pages/app'));
 export const FridgePage = lazy(() => import('src/pages/fridge'));
+export const FridgeDetailPage = lazy(() => import('src/pages/fridge-detail'));
 export const UserPage = lazy(() => import('src/pages/user'));
 export const LoginPage = lazy(() => import('src/pages/login'));
 export const RegisterPage = lazy(() => import('src/pages/register'));
 export const VerificationPage = lazy(() => import('src/pages/verification'));
-export const FridgeProductsPage = lazy(() => import('src/pages/fridge-product'));
 export const AssortmentPage = lazy(() => import('src/pages/assortment'));
+export const ProductPage = lazy(() => import('src/pages/product'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
 
 export default function Router() {
@@ -30,8 +31,9 @@ export default function Router() {
         { element: <IndexPage />, index: true },
         { path: 'user', element: <UserPage /> },
         { path: 'assortment', element: <AssortmentPage /> },
+        { path: 'product', element: <ProductPage /> },
         { path: 'fridge', element: <FridgePage /> },
-        { path: 'fridge-product', element: <FridgeProductsPage /> },
+        { path: 'fridge-detail/:id', element: <FridgeDetailPage /> }, 
       ],
     },
     {

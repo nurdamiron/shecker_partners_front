@@ -12,7 +12,7 @@ import Modal from '@mui/material/Modal';
 import TextField from '@mui/material/TextField';
 import Iconify from 'src/components/iconify';
 
-import AssortmentCard from '../assortment-card';
+import ProductCard from '../product-card';
 
 // Function to refresh access token
 const refreshAccessToken = async () => {
@@ -43,8 +43,8 @@ const verifyAccessToken = async (token) => {
   }
 };
 
-// Function to fetch a Assortment by ID
-const fetchAssortmentById = async (id) => {
+// Function to fetch a product by ID
+const fetchProductById = async (id) => {
   try {
     let accessToken = localStorage.getItem('accessToken');
     const isTokenValid = await verifyAccessToken(accessToken);
@@ -70,7 +70,7 @@ const fetchAssortmentById = async (id) => {
 };
 
 // Function to fetch all products
-const fetchAssortments = async (setAssortments) => {
+const fetchProducts = async (setProducts) => {
   try {
     let accessToken = localStorage.getItem('accessToken');
     const isTokenValid = await verifyAccessToken(accessToken);
@@ -88,12 +88,12 @@ const fetchAssortments = async (setAssortments) => {
       }
     });
 
-    const AssortmentsWithDetails = await Promise.all(response.data.map(async (assortment) => {
-      const assortmentDetails = await fetchAssortmentById(assortment.id);
-      return { ...assortment, ...assortmentDetails };
+    const productsWithDetails = await Promise.all(response.data.map(async (product) => {
+      const productDetails = await fetchProductById(product.id);
+      return { ...product, ...productDetails };
     }));
 
-    setAssortments(AssortmentsWithDetails);
+    setProducts(productsWithDetails);
   } catch (error) {
     if (error.response) {
       if (error.response.data.detail) {
@@ -108,7 +108,7 @@ const fetchAssortments = async (setAssortments) => {
 };
 
 // Function to add a new product
-const addAssortment = async (assortmentData, setAssortments, handleCloseAddModal) => {
+const addProduct = async (productData, setProducts, handleCloseAddModal) => {
   try {
     let accessToken = localStorage.getItem('accessToken');
     const isTokenValid = await verifyAccessToken(accessToken);
@@ -120,13 +120,13 @@ const addAssortment = async (assortmentData, setAssortments, handleCloseAddModal
       }
     }
 
-    const response = await axios.post('https://shecker-admin.com/api/product/admin/', assortmentData, {
+    const response = await axios.post('https://shecker-admin.com/api/product/admin/', productData, {
       headers: {
         'Authorization': `Bearer ${accessToken}`
       }
     });
 
-    setAssortments(prevAssortments => [...prevAssortments, response.data]);
+    setProducts(prevProducts => [...prevProducts, response.data]);
     handleCloseAddModal();
   } catch (error) {
     console.error('Error adding product:', error);
@@ -137,7 +137,7 @@ const addAssortment = async (assortmentData, setAssortments, handleCloseAddModal
 };
 
 // Function to delete a product
-const deleteAssortment = async (id, setAssortments) => {
+const deleteProduct = async (id, setProducts) => {
   try {
     let accessToken = localStorage.getItem('accessToken');
     const isTokenValid = await verifyAccessToken(accessToken);
@@ -155,7 +155,7 @@ const deleteAssortment = async (id, setAssortments) => {
       }
     });
 
-    setAssortments(prevAssortments => prevAssortments.filter(assortment => assortment.id !== id));
+    setProducts(prevProducts => prevProducts.filter(product => product.id !== id));
   } catch (error) {
     console.error('Error deleting product:', error);
     if (error.response && error.response.data.detail) {
@@ -166,9 +166,9 @@ const deleteAssortment = async (id, setAssortments) => {
 
 // ----------------------------------------------------------------------
 
-export default function AssortmentView() {
-  const [assortments, setAssortments] = useState([]);
-  const [selectedAssortment, setSelectedAssortment] = useState(null);
+export default function ProductView() {
+  const [products, setProducts] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const [openModal, setOpenModal] = useState(false);
   const [openAddModal, setOpenAddModal] = useState(false);
   const [imageFile, setImageFile] = useState(null);
@@ -180,22 +180,22 @@ export default function AssortmentView() {
   });
 
   useEffect(() => {
-    fetchAssortments(setAssortments);
+    fetchProducts(setProducts);
   }, []);
 
-  const handleDeleteAssortment = (id) => {
-    deleteAssortment(id, setAssortments);
+  const handleDeleteProduct = (id) => {
+    deleteProduct(id, setProducts);
   };
 
-  const handleEditAssortment = async (assortment) => {
-    const assortmentDetails = await fetchAssortmentById(assortment.id);
-    if (assortmentDetails) {
-      setSelectedAssortment(assortmentDetails);
+  const handleEditProduct = async (product) => {
+    const productDetails = await fetchProductById(product.id);
+    if (productDetails) {
+      setSelectedProduct(productDetails);
       setFormData({
-        name: assortmentDetails.name,
-        description: assortmentDetails.description,
-        price: assortmentDetails.price,
-        image: assortmentDetails.image,
+        name: productDetails.name,
+        description: productDetails.description,
+        price: productDetails.price,
+        image: productDetails.image,
       });
       setOpenModal(true);
     }
@@ -203,7 +203,7 @@ export default function AssortmentView() {
 
   const handleCloseModal = () => {
     setOpenModal(false);
-    setSelectedAssortment(null);
+    setSelectedProduct(null);
     setImageFile(null);
   };
 
@@ -233,7 +233,7 @@ export default function AssortmentView() {
     }
   };
 
-  const handleUpdateAssortment = async () => {
+  const handleUpdateProduct = async () => {
     let imageUrl = formData.image;
 
     if (imageFile) {
@@ -251,15 +251,15 @@ export default function AssortmentView() {
         async () => {
           imageUrl = await getDownloadURL(uploadTask.snapshot.ref);
           console.log('Image URL:', imageUrl); // Log the image URL for debugging
-          await updateAssortment(imageUrl);
+          await updateProduct(imageUrl);
         }
       );
     } else {
-      await updateAssortment(imageUrl);
+      await updateProduct(imageUrl);
     }
   };
 
-  const handleAddAssortment = async () => {
+  const handleAddProduct = async () => {
     let imageUrl = '';
 
     if (imageFile) {
@@ -277,17 +277,17 @@ export default function AssortmentView() {
         async () => {
           imageUrl = await getDownloadURL(uploadTask.snapshot.ref);
           console.log('Image URL:', imageUrl); // Log the image URL for debugging
-          const assortmentData = { ...formData, image: imageUrl };
-          await addAssortment(assortmentData, setAssortments, handleCloseAddModal);
+          const productData = { ...formData, image: imageUrl };
+          await addProduct(productData, setProducts, handleCloseAddModal);
         }
       );
     } else {
-      const assortmentData = { ...formData, image: imageUrl };
-      await addAssortment(assortmentData, setAssortments, handleCloseAddModal);
+      const productData = { ...formData, image: imageUrl };
+      await addProduct(productData, setProducts, handleCloseAddModal);
     }
   };
 
-  const updateAssortment = async (imageUrl) => {
+  const updateProduct = async (imageUrl) => {
     try {
       let accessToken = localStorage.getItem('accessToken');
       const isTokenValid = await verifyAccessToken(accessToken);
@@ -299,7 +299,7 @@ export default function AssortmentView() {
         }
       }
 
-      await axios.patch(`https://shecker-admin.com/api/product/admin/${selectedAssortment.id}`, {
+      await axios.patch(`https://shecker-admin.com/api/product/admin/${selectedProduct.id}`, {
         ...formData,
         image: imageUrl,
       }, {
@@ -308,7 +308,7 @@ export default function AssortmentView() {
         }
       });
 
-      fetchAssortments(setAssortments);
+      fetchProducts(setProducts);
       handleCloseModal();
     } catch (error) {
       console.error('Error updating product:', error);
@@ -330,9 +330,9 @@ export default function AssortmentView() {
       </Stack>
 
       <Grid container spacing={3}>
-        {assortments.map((assortment) => (
-          <Grid key={assortment.id} xs={12} sm={6} md={3}>
-            <AssortmentCard assortment={assortment} onDelete={handleDeleteAssortment} onEdit={() => handleEditAssortment(assortment)} />
+        {products.map((product) => (
+          <Grid key={product.id} xs={12} sm={6} md={3}>
+            <ProductCard product={product} onDelete={handleDeleteProduct} onEdit={() => handleEditProduct(product)} />
           </Grid>
         ))}
       </Grid>
@@ -375,7 +375,7 @@ export default function AssortmentView() {
           </Button>
           <Stack direction="row" spacing={2} justifyContent="flex-end">
             <Button onClick={handleCloseModal}>Cancel</Button>
-            <Button variant="contained" onClick={handleUpdateAssortment}>Save</Button>
+            <Button variant="contained" onClick={handleUpdateProduct}>Save</Button>
           </Stack>
         </div>
       </Modal>
@@ -418,7 +418,7 @@ export default function AssortmentView() {
           </Button>
           <Stack direction="row" spacing={2} justifyContent="flex-end">
             <Button onClick={handleCloseAddModal}>Cancel</Button>
-            <Button variant="contained" onClick={handleAddAssortment}>Add</Button>
+            <Button variant="contained" onClick={handleAddProduct}>Add</Button>
           </Stack>
         </div>
       </Modal>
