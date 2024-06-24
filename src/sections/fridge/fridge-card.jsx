@@ -1,5 +1,7 @@
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
 import Grid from '@mui/material/Unstable_Grid2';
@@ -11,13 +13,14 @@ import { database } from 'src/firebase_config'; // Adjust the import path accord
 import LocationOnIcon from '@mui/icons-material/LocationOn'; // Import location icon
 import LockOpenIcon from '@mui/icons-material/LockOpen';
 import LockIcon from '@mui/icons-material/Lock';
+import { useNavigate } from 'react-router-dom';
 
 export default function FridgeCard({ fridge, index }) {
   const { account, address, id } = fridge;
-
   const [doorStatus, setDoorStatus] = useState(0);
   const [isAvailable, setIsAvailable] = useState(false);
   const [lastTimer, setLastTimer] = useState(0);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fridgeRef = ref(database, `${id}/timer/timer`);
@@ -32,6 +35,8 @@ export default function FridgeCard({ fridge, index }) {
 
     // Listen to timer changes
     const timerListener = onValue(fridgeRef, handleTimerUpdate);
+
+  
 
     // Listen to door status changes
     const doorListener = onValue(doorRef, (snapshot) => {
@@ -58,6 +63,10 @@ export default function FridgeCard({ fridge, index }) {
     };
   }, [id, lastTimer]);
 
+  const handleManageFridge = () => {
+    navigate(`/fridge-product/${id}`);
+  };
+  
   const handleToggleDoor = () => {
     const newDoorStatus = doorStatus === 0 ? 1 : 0;
     set(ref(database, `${id}/door/doorOpen`), newDoorStatus);
@@ -139,7 +148,7 @@ export default function FridgeCard({ fridge, index }) {
                 name="doorStatusSwitch"
                 color="primary"
               />
-              
+              <Button onClick={handleManageFridge}>Управление</Button>
             </Stack>
           ) : (
             <Typography variant="h6" color="error">

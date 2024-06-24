@@ -11,7 +11,6 @@ import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
 import Iconify from 'src/components/iconify';
 
-// Function to refresh access token
 const refreshAccessToken = async () => {
   try {
     const refreshToken = localStorage.getItem('refreshToken');
@@ -27,7 +26,6 @@ const refreshAccessToken = async () => {
   }
 };
 
-// Function to verify access token
 const verifyAccessToken = async (token) => {
   try {
     await axios.post('https://shecker-admin.com/api/auth/sign-in/verify', {
@@ -40,8 +38,7 @@ const verifyAccessToken = async (token) => {
   }
 };
 
-// Function to fetch fridge details
-const fetchFridgeDetails = async (account, setFridgeDetails) => {
+const fetchFridgeDetails = async (id, setFridgeDetails) => {
   try {
     let accessToken = localStorage.getItem('accessToken');
     const isTokenValid = await verifyAccessToken(accessToken);
@@ -53,7 +50,7 @@ const fetchFridgeDetails = async (account, setFridgeDetails) => {
       }
     }
 
-    const response = await axios.get(`https://shecker-admin.com/api/fridge/admin/${account}/`, {
+    const response = await axios.get(`https://shecker-admin.com/api/fridge/admin/${id}/`, {
       headers: {
         'Authorization': `Bearer ${accessToken}`,
       },
@@ -65,7 +62,6 @@ const fetchFridgeDetails = async (account, setFridgeDetails) => {
   }
 };
 
-// Function to fetch products
 const fetchProducts = async (setProducts) => {
   try {
     let accessToken = localStorage.getItem('accessToken');
@@ -90,8 +86,7 @@ const fetchProducts = async (setProducts) => {
   }
 };
 
-// Function to update fridge products
-const updateFridgeProducts = async (account, fridgeProducts) => {
+const updateFridgeProducts = async (id, fridgeProducts) => {
   try {
     let accessToken = localStorage.getItem('accessToken');
     const isTokenValid = await verifyAccessToken(accessToken);
@@ -103,7 +98,7 @@ const updateFridgeProducts = async (account, fridgeProducts) => {
       }
     }
 
-    await axios.put(`https://shecker-admin.com/api/fridge/admin/${account}/`, {
+    await axios.put(`https://shecker-admin.com/api/fridge/admin/${id}/`, {
       fridge_products: fridgeProducts,
     }, {
       headers: {
@@ -118,16 +113,16 @@ const updateFridgeProducts = async (account, fridgeProducts) => {
 };
 
 export default function FridgeProducts() {
-  const { account } = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
   const [fridgeDetails, setFridgeDetails] = useState(null);
   const [products, setProducts] = useState([]);
   const [fridgeProducts, setFridgeProducts] = useState([]);
 
   useEffect(() => {
-    fetchFridgeDetails(account, setFridgeDetails);
+    fetchFridgeDetails(id, setFridgeDetails);
     fetchProducts(setProducts);
-  }, [account]);
+  }, [id]);
 
   useEffect(() => {
     if (fridgeDetails) {
@@ -164,7 +159,7 @@ export default function FridgeProducts() {
   };
 
   const handleSave = () => {
-    updateFridgeProducts(account, fridgeProducts);
+    updateFridgeProducts(id, fridgeProducts);
   };
 
   if (!fridgeDetails) {
@@ -174,7 +169,7 @@ export default function FridgeProducts() {
   return (
     <Container>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">Управление продуктами в холодильнике {account}</Typography>
+        <Typography variant="h4">Управление продуктами в холодильнике {id}</Typography>
         <Button variant="contained" color="inherit" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleAddProduct}>
           Добавить продукт
         </Button>

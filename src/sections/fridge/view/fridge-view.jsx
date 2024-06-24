@@ -5,10 +5,10 @@ import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
 
 import Iconify from 'src/components/iconify';
 import FridgeCard from '../fridge-card';
-import FridgeSearch from '../fridge-search';
 import FridgeSort from '../fridge-sort'; // Import FridgeSort component
 
 // Function to refresh access token
@@ -123,7 +123,7 @@ export default function FridgeView() {
       </Stack>
 
       <Stack mb={5} direction="row" alignItems="center" justifyContent="space-between" spacing={2}>
-        <FridgeSearch fridge={fridges} />
+        {/* <FridgeSearch fridge={fridges} /> */}
         <FridgeSort 
           options={[
             { value: 'number', label: 'По номеру' },
@@ -136,18 +136,27 @@ export default function FridgeView() {
         />
       </Stack>
 
-      <Grid container spacing={1}>
-        {sortedFridges.map((fridge, index) => (
-          <FridgeCard
-            key={fridge.account}
-            fridge={{
-              ...fridge,
-              id: fridge.account, // Assuming account corresponds to the index for Firebase path
-            }}
-            index={index}
-          />
-        ))}
-      </Grid>
+      {sortedFridges.length > 0 ? (
+        <Grid container spacing={1}>
+          {sortedFridges.map((fridge, index) => (
+            <FridgeCard
+              key={fridge.account}
+              fridge={{
+                ...fridge,
+                id: fridge.account, // Assuming account corresponds to the index for Firebase path
+              }}
+              index={index}
+            />
+          ))}
+        </Grid>
+      ) : (
+        <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="50vh">
+          <img src="./assets/fridge.png" alt="No fridges" style={{ width: '150px', height: '150px' }} />
+          <Typography variant="h4" align="center" mt={5}>
+            У вас нет зарегистрированных холодильников
+          </Typography>
+        </Box>
+      )}
     </Container>
   );
 }
