@@ -171,11 +171,12 @@ const fetchInitialOrders = async (setOrders, setTotalPages, setLoading, setCurre
       },
     });
 
-    if (response.data && response.data.count) {
-      const totalPages = Math.ceil(response.data.count / 20); // Here we divide by 20 as each page contains 20 items
+    if (response.data && response.data.results) {
+      const successOrders = response.data.results.filter(order => order.status === 'SUCCESS');
+      const totalPages = Math.ceil(successOrders.length / ITEMS_PER_PAGE);
       setTotalPages(totalPages);
-      setCurrentPage(totalPages);
-      await fetchOrders(accessToken, totalPages, setOrders, setLoading);  // Fetch the last page
+      setCurrentPage(1);  // Устанавливаем первую страницу
+      await fetchOrders(accessToken, 1, setOrders, setLoading);  // Получаем данные с первой страницы
     }
   } catch (error) {
     console.error('Error fetching initial orders:', error);
@@ -375,6 +376,7 @@ export default function AppView() {
                 <TableHead>
                   <TableRow>
                     {/* <TableCell>Число успешных заказов</TableCell> */}
+                    {/* <TableCell>ID Холодильника</TableCell> */}
                     <TableCell>Имя продукта</TableCell>
                     <TableCell align="right">Количество</TableCell>
                     <TableCell align="right">Сумма</TableCell>
@@ -384,7 +386,7 @@ export default function AppView() {
                 <TableBody>
                   {orders.map((order, index) => (
                     <TableRow key={order.id}>
-                      {/* <TableCell>{index + 1 + (currentPage - 1) * 20}</TableCell> */}
+                      {/* <TableCell>"{order.order_products.map(product => product.product.name).join(', ')}"</TableCell> */}
                       <TableCell>{order.order_products.map(product => product.product.name).join(', ')}</TableCell>
                       <TableCell align="right">{order.order_products.map(product => product.amount).reduce((acc, amount) => acc + amount, 0)}</TableCell>
                       <TableCell align="right">{order.total_sum}</TableCell>

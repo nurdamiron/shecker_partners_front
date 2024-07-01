@@ -1,6 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 
-import FridgeDetail from 'src/sections/fridge-detail/view/fridge-detail';
+import FridgeDetail from 'src/sections/fridge-details/view/fridge-detail';
 
 // ----------------------------------------------------------------------
 
