@@ -20,6 +20,7 @@ import { formatDateTime } from '../../../utils/format-date';
 import { fetchAllOrders, fetchOrdersPage } from '../order-service';
 
 
+
 function AppView() {
   const [state, setState] = useState({
     fridgeCount: 0,
@@ -35,9 +36,12 @@ function AppView() {
 const navigate = useNavigate();
 
 useEffect(() => {
-  const initFetch = async () => {
+    const initFetch = async () => {
+      console.log('Проверка доступа пользователя...');
       if (!await verifyAccessToken()) {
+          console.log('Доступ не подтвержден, обновление токена...');
           if (!await refreshAccessToken()) {
+              console.log('Не удалось обновить токен, перенаправление на страницу входа...');
               navigate('/login');
               return;
           }
@@ -45,7 +49,9 @@ useEffect(() => {
 
       setState(prev => ({ ...prev, loading: true }));
       try {
+          console.log('Запрос данных о заказах...');
           const result = await fetchAllOrders();
+          console.log('Получены данные:', result);
           setState(prev => ({
               ...prev,
               fridgeCount: result.fridgeCount,
@@ -56,47 +62,53 @@ useEffect(() => {
               loading: false
           }));
       } catch (error) {
-          console.error('Error fetching initial data:', error);
+          console.error('Ошибка при получении данных:', error);
           setState(prev => ({ ...prev, loading: false }));
       }
+    };
+
+    initFetch();
+  }, [navigate]);
+
+
+  const handlePageChange = async (event, value) => {
+    console.log(`Переход на страницу ${value}...`);
+    setState(prev => ({ ...prev, loading: true }));
+    try {
+        const orders = await fetchOrdersPage(value);
+        console.log('Получены данные для страницы:', orders);
+        setState(prev => ({
+            ...prev,
+            currentPage: value,
+            orders,
+            loading: false
+        }));
+    } catch (error) {
+        console.error('Ошибка при смене страницы:', error);
+        setState(prev => ({ ...prev, loading: false }));
+    }
   };
-
-  initFetch();
-}, [navigate]);
-
-
-const handlePageChange = async (event, value) => {
-  setState(prev => ({ ...prev, loading: true }));
-  try {
-      const orders = await fetchOrdersPage(value);
-      setState(prev => ({
-          ...prev,
-          currentPage: value,
-          orders,
-          loading: false
-      }));
-  } catch (error) {
-      console.error('Error changing page:', error);
-      setState(prev => ({ ...prev, loading: false }));
-  }
-};
 
 return (
   <Container maxWidth="xl">
-      <Typography variant="h4" sx={{ mb: 5 }}>Привет, с возвращением 👋</Typography>
-      <Grid container spacing={3}>
-          {summaryWidgets.map((widget, index) => (
-              <Grid item xs={12} sm={6} md={3} key={index}>
-                  <AppWidgetSummary title={widget.title} total={state[widget.stateKey]} color={widget.color} icon={widget.icon} />
-              </Grid>
-          ))}
-          <Grid item xs={12}>
-              {state.loading ? <CircularProgress /> : renderTable(state.orders)}
-          </Grid>
-          <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-              <Pagination count={state.totalPages} page={state.currentPage} onChange={handlePageChange} />
-          </Grid>
-      </Grid>
+    <Typography variant="h4" sx={{ mb: 5 }}>Привет, с возвращением 👋</Typography>
+    <Grid container spacing={3}>
+        {summaryWidgets.map((widget, index) => (
+            <Grid item xs={12} sm={6} md={3} key={index}>
+                <AppWidgetSummary title={widget.title} total={state[widget.stateKey]} color={widget.color} icon={widget.icon} />
+            </Grid>
+        ))}
+        <Grid item xs={12}>
+            {state.loading ? (
+                <div className="justify-center loading-container">
+                    <CircularProgress />
+                </div>
+            ) : renderTable(state.orders)}
+        </Grid>
+        <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+            <Pagination count={state.totalPages} page={state.currentPage} onChange={handlePageChange} />
+        </Grid>
+    </Grid>
   </Container>
 );
 }
@@ -113,18 +125,18 @@ function renderTable(orders) {
           <Table sx={{ minWidth: 350 }} aria-label="simple table">
               <TableHead>
                   <TableRow>
+                      {/* <TableCell>ID</TableCell> */}
                       <TableCell>ID</TableCell>
-                      <TableCell>Холодильник ID</TableCell>
                       <TableCell>Продукт</TableCell>
                       <TableCell align="right">К-во</TableCell>
                       <TableCell align="right">Сумма</TableCell>
-                      <TableCell align="right">Дата заказа</TableCell>
+                      <TableCell align="right">Дата</TableCell>
                   </TableRow>
               </TableHead>
               <TableBody>
                   {orders && orders.length > 0 ? orders.map((order, index) => (
                       <TableRow key={index}>
-                          <TableCell>{order.id}</TableCell>
+                          {/* <TableCell>{order.id}</TableCell> */}
                           <TableCell>{order.fridgeId}</TableCell>
                           <TableCell>{order.order_products?.map(product => `${product.product.name} (${product.amount})`).join(', ') || 'No products'}</TableCell>
                           <TableCell align="right">{order.order_products?.reduce((acc, product) => acc + product.amount, 0) || 0}</TableCell>

@@ -41,7 +41,6 @@ async function fetchAllOrders() {
     let totalSales = 0;
     let data;
 
-
     do {
         // eslint-disable-next-line no-await-in-loop
         data = await fetchAPI(`/order/admin/?page=${page}&status=SUCCESS`);
@@ -60,8 +59,13 @@ async function fetchOrdersPage(page) {
     try {
         const data = await fetchAPI(`/order/admin/?status=SUCCESS&page=${page}`);
         const detailedOrders = await Promise.all(data.results.map(async order => {
+            const detailResponse = await fetchAPI(`/order/admin/${order.id}`);
             const fridgeId = await fetchAPI(`/order/detail/${order.id}`).then(detail => detail.fridge_id);
-            return { ...order, fridgeId };
+            const products = detailResponse.order_products.map(product => ({
+                name: product.product.name,
+                amount: product.amount
+            }));
+            return { ...order, fridgeId, order_products: products };
         }));
 
         const totalRevenue = detailedOrders.reduce((acc, order) => acc + order.total_sum, 0);
@@ -75,4 +79,4 @@ async function fetchOrdersPage(page) {
     }
 }
 
-export { fetchAllOrders, fetchOrdersPage };
+export { fetchAllOrders, fetchOrdersPage, fetchAPI };
