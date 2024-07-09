@@ -104,7 +104,7 @@ return (
 const summaryWidgets = [
   { title: "Общее количество холодильников", stateKey: "fridgeCount", color: "success", icon: <img alt="fridge icon" src="/assets/icons/fridge.svg" /> },
   { title: "Количество заказов", stateKey: "totalSales", color: "warning", icon: <img alt="sales icon" src="/assets/icons/sales.svg" /> },
-  { title: "Сумма заработка", stateKey: "totalRevenue", color: "error", icon: <img alt="wallet icon" src="/assets/icons/wallet.svg" /> }
+  { title: "Сумма заработка в тенге", stateKey: "totalRevenue", color: "error", icon: <img alt="wallet icon" src="/assets/icons/wallet.svg" /> }
 ];
 
 function renderTable(orders) {
