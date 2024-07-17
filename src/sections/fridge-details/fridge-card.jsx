@@ -47,7 +47,7 @@ export default function FridgeCard({ fridge, index }) {
       }).catch((error) => {
         console.error('Error fetching timer:', error);
       });
-    }, 11000);
+    }, 4000);
 
     return () => {
       clearInterval(intervalId);

@@ -45,7 +45,7 @@ export default function FridgeCard({ fridge, onManageClick }) {
       }).catch((error) => {
         console.error('Error fetching timer:', error);
       });
-    }, 11000);
+    }, 4000);
 
     return () => {
       clearInterval(intervalId);
